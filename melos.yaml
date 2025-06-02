@@ -1,0 +1,81 @@
+name: unread_frontend
+
+packages:
+  - apps/**
+  - packages/**
+
+command:
+  version:
+    workspaceChangelog: true
+  bootstrap:
+    environment:
+      sdk: '>=3.0.0 <4.0.0'
+      flutter: '>=3.19.0'
+
+scripts:
+  analyze:
+    description: Run dart analyzer for all packages
+    run: dart analyze .
+    exec:
+      concurrency: 5
+
+  format:
+    description: Format all Dart files
+    run: dart format .
+    exec:
+      concurrency: 5
+
+  format:check:
+    description: Check if all Dart files are formatted
+    run: dart format --set-exit-if-changed .
+    exec:
+      concurrency: 5
+
+  test:
+    description: Run tests for all packages
+    run: flutter test
+    exec:
+      concurrency: 5
+
+  build_runner:watch:
+    description: Run build_runner in watch mode for code generation
+    run: dart run build_runner watch --delete-conflicting-outputs
+    exec:
+      concurrency: 5
+
+  build_runner:build:
+    description: Run build_runner for code generation
+    run: dart run build_runner build --delete-conflicting-outputs
+    exec:
+      concurrency: 5
+
+  assets:
+    description: Generate assets with flutter_gen
+    run: dart run flutter_gen
+    exec:
+      concurrency: 5
+
+  clean:
+    description: Clean all packages
+    run: flutter clean
+    exec:
+      concurrency: 5
+
+  get:
+    description: Get dependencies for all packages
+    run: flutter pub get
+    exec:
+      concurrency: 5
+
+  lint:
+    description: Run custom linting
+    run: dart run custom_lint
+    exec:
+      concurrency: 5
+
+  check:
+    description: Run all checks (analyze, format:check, test)
+    run: |
+      melos run analyze &&
+      melos run format:check &&
+      melos run test 

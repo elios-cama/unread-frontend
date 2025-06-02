@@ -1,0 +1,265 @@
+# Unread Frontend
+
+## Solving a problem (chain of thought)
+
+Always provide a step-by-step explanation of how to solve the problem.
+First, understand the input and output requirements.
+Next, break down the problem into smaller tasks or functions.
+Then, describe the approach or algorithm needed to solve each task.
+Finally, combine the steps into a complete solution.
+
+Every time you choose to apply a rule(s), explicitly state the rule(s) in the output.
+You can abbreviate the rule description to a single word or phrase.
+
+## Monorepo Structure Rules
+
+**IMPORTANT**: This is a Melos monorepo. The root directory is ONLY for monorepo configuration.
+
+### File Placement Rules
+- **NEVER** create files directly in the root folder
+- **NEVER** add application code to the root directory
+- **ALL** code must go in either `/apps` or `/packages` directories
+- Root folder is exclusively for:
+  - melos.yaml (monorepo configuration)
+  - pubspec.yaml (workspace dependencies)
+  - .gitignore
+  - .cursorrules
+  - README.md (if needed)
+  - CI/CD configuration files
+
+### Development Guidelines
+- Create new packages in `/packages` directory
+- Create new applications in `/apps` directory
+- Each package/app has its own pubspec.yaml
+- Use melos commands for cross-package operations
+- Follow the established package structure patterns
+
+## Project context
+
+Unread is a mobile-first ebook sharing platform that connects authors and readers. On Unread, authors can upload and share their original ebooks with privacy controls (private, public, invite-only), while readers can discover and read new content. The platform features trackable share links with analytics and cross-device reading progress tracking.
+
+## Core Technologies & Packages
+
+- Flutter & Dart (latest stable versions)
+- State Management: flutter_riverpod
+- Navigation: go_router
+- HTTP Client: dio
+- Image Caching: cached_network_image
+- Code Generation: freezed, json_annotation
+- Asset Management: flutter_gen
+- Localization: easy_localization
+- Generated code management: build_runner
+- Monorepo management: melos
+
+## Project Overview
+
+Unread is a cross-platform Flutter application divided into two main parts: apps and packages.
+
+### Applications
+
+- unread_mobile: Mobile application
+- unread_webapp: Web application
+  Both applications share most of their codebase and functionality, with minor platform-specific differences.
+
+#### Webapp Specific Context
+
+The webapp is designed for web browsers with responsive design principles:
+
+- Must work across desktop, tablet, and mobile viewports
+- Should maintain responsive design patterns
+- Mobile-first approach with progressive enhancement
+- Touch-friendly interface across all device sizes
+- Responsive breakpoints for optimal viewing experience
+
+### Shared Packages
+
+1. common:
+
+   - Contains shared business logic
+   - Network calls and API client (Dio)
+   - Providers (Riverpod)
+   - Models (Freezed)
+   - Repository implementations
+   - Authentication logic
+   - Any logic that can be reused between apps
+
+2. design_ui:
+
+   - Contains only shared widgets
+   - No business logic
+   - Pure UI components
+   - Widget callbacks must be passed as parameters
+   - Any required logic should be in common package or apps
+
+3. app_ui:
+
+   - Shared assets
+   - Theme definitions
+   - Style constants
+   - Common UI resources
+   - Generated assets (flutter_gen)
+
+4. authentication:
+   - Shared authentication logic (OAuth, JWT)
+   - Used by both applications
+   - Authentication flows and states
+
+### Project Structure
+
+```
+/apps
+  /unread_mobile      # Mobile application
+  /unread_webapp      # Web application
+/packages
+  /design_ui          # Shared UI components
+  /common             # Shared business logic
+  /app_ui             # Shared assets and themes
+  /authentication     # Shared authentication
+```
+
+#### Application Structure (mobile & webapp)
+
+```
+/lib
+  /core               # Core application logic
+    /utils            # Utilities
+    /provider         # Global providers
+    /router           # Route configuration
+    /error            # Error handling
+  /src                # Main source code
+    /{feature}        # By feature (auth, library, reader, profile...)
+      /data
+        /source
+          /remote     # Remote data sources (API)
+          /local      # Local data sources (cache, preferences)
+        /repository   # Repository implementations
+      /domain
+        /model        # Data models (freezed)
+        /usecase      # Use case implementations
+      /presentation
+        /page         # Pages/screens
+        /widget       # Feature-specific widgets
+        /provider     # Presentation providers (Riverpod)
+```
+
+#### Shared Packages Structure
+
+```
+/design_ui
+  /lib/src
+    /widgets          # Reusable widgets
+    /theme            # Themes and styles
+
+/common
+  /lib/src
+    /models           # Shared models
+    /utils            # Shared utilities
+    /api              # API client and services
+    /repository       # Repository interfaces
+
+/app_ui
+  /lib/src
+    /assets           # Asset management
+    /theme            # Theme definitions
+    /constants        # Style constants
+```
+
+## Development Guidelines
+
+- All solutions must work on both Flutter mobile and web
+- Implementation required for both platforms
+- Business logic should be in common package when possible
+- UI components should be in design_ui package
+- Platform-specific code should be in respective apps
+- Follow KISS and DRY principles
+- Don't include comments unless it's for complex logic
+- One widget/class per file (keep widgets small and focused)
+- Extract repeated widgets
+- Show loading indicators
+- Handle errors gracefully and show user-friendly error messages
+
+## Naming Conventions
+
+- Use PascalCase for classes and types
+- Use camelCase for variables, functions, and instances
+- Use snake_case for file names
+- Prefix private members with underscore
+- Boolean variables should start with: is, has, can, should
+- Use clear, descriptive names without abbreviations
+- Files containing widgets should end with '_widget.dart'
+- Files containing pages should end with '_page.dart'
+- Files containing providers should end with '_provider.dart'
+
+## State Management (Riverpod) and Provider Guidelines
+
+- Use @riverpod annotation for code generation
+- Prefer AsyncNotifier over StateNotifier
+- Keep providers small and focused
+- Handle loading and error states with AsyncValue
+- Cache network responses appropriately
+- Dispose resources properly
+- Use ref.watch() for reactive dependencies
+- Use ref.read() for one-time reads
+- Combine with freezed for immutable state management
+
+## Model Management (Freezed) and Class Generation
+
+- Use @freezed annotation for data classes
+- Generate JSON serialization methods with json_annotation
+- Create factory Model.empty() which returns a model with default values for each class
+- Use copyWith for immutable updates
+- Implement proper equality and toString methods
+
+## API Integration (Dio)
+
+- Use Dio for all HTTP requests
+- Implement proper error handling
+- Use interceptors for authentication tokens
+- Handle network connectivity issues
+- Implement request/response logging in debug mode
+- Use proper timeout configurations
+
+## Translation
+
+- Translate all strings in both apps (assets/translations)
+- Never use hardcoded strings in the code, always use translation keys
+- Translation keys should follow a hierarchical structure (feature_subfeature_key)
+- Example: library_book_title, auth_login_button, reader_progress_save
+
+## Ebook-Specific Features
+
+- Support multiple formats (EPUB, MOBI, PDF)
+- Implement reading progress tracking
+- Handle file downloads and caching
+- Support offline reading
+- Implement bookmark functionality
+- Privacy controls (private, public, invite-only)
+- Share link generation and analytics
+
+## Git usage
+
+- Use the following prefixes for commit messages followed by a colon and a space:
+  - "fix:" for bug fixes
+  - "feat:" for new features
+  - "perf:" for performance improvements
+  - "docs:" for documentation changes
+  - "style:" for formatting changes
+  - "refactor:" for code refactoring
+  - "test:" for adding missing tests
+  - "chore:" for maintenance tasks
+- When determining the commit message prefix, pick the most relevant prefix from the list above.
+- Rules:
+  - Use lowercase for commit messages
+  - Keep the summary line concise
+  - Include description for non-obvious changes
+  - Reference issue numbers when applicable
+  - The commit message should also include a list of the changes made in the commit after the summary line if the changes are not self-explanatory.
+
+## Testing Guidelines
+
+- Write unit tests for business logic
+- Write widget tests for UI components
+- Use integration tests for complete user flows
+- Mock external dependencies
+- Test error states and edge cases
+- Maintain good test coverage 

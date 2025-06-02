@@ -1,0 +1,73 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Mobile - Staging",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "apps/unread_mobile",
+      "program": "lib/main_staging.dart",
+      "args": [
+        "--flavor",
+        "staging"
+      ]
+    },
+    {
+      "name": "Mobile - Production", 
+      "request": "launch",
+      "type": "dart",
+      "cwd": "apps/unread_mobile",
+      "program": "lib/main_production.dart",
+      "args": [
+        "--flavor", 
+        "production"
+      ]
+    },
+    {
+      "name": "Mobile - Default (Staging)",
+      "request": "launch", 
+      "type": "dart",
+      "cwd": "apps/unread_mobile",
+      "program": "lib/main.dart"
+    },
+    {
+      "name": "Mobile - Staging (iPhone)",
+      "request": "launch",
+      "type": "dart", 
+      "cwd": "apps/unread_mobile",
+      "program": "lib/main_staging.dart",
+      "args": [
+        "--flavor",
+        "staging",
+        "--device-id",
+        "00008110-00116D5A0E06801E"
+      ]
+    },
+    {
+      "name": "Mobile - Production (iPhone)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "apps/unread_mobile", 
+      "program": "lib/main_production.dart",
+      "args": [
+        "--flavor",
+        "production",
+        "--device-id", 
+        "00008110-00116D5A0E06801E"
+      ]
+    },
+    {
+      "name": "Mobile - Web (Staging)",
+      "request": "launch",
+      "type": "dart",
+      "cwd": "apps/unread_mobile",
+      "program": "lib/main_staging.dart", 
+      "args": [
+        "--flavor",
+        "staging",
+        "--device-id",
+        "chrome"
+      ]
+    }
+  ]
+} 
