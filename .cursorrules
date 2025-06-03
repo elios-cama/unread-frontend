@@ -177,6 +177,7 @@ The webapp is designed for web browsers with responsive design principles:
 - Extract repeated widgets
 - Show loading indicators
 - Handle errors gracefully and show user-friendly error messages
+- for colors don't use withOpacity but .withValues(alpha:value)
 
 ## Naming Conventions
 
@@ -262,4 +263,267 @@ The webapp is designed for web browsers with responsive design principles:
 - Use integration tests for complete user flows
 - Mock external dependencies
 - Test error states and edge cases
-- Maintain good test coverage 
+- Maintain good test coverage
+
+## Backend Data Models Context
+
+# Frontend Data Models for Unread Mobile App
+
+This document outlines the data models (Pydantic schemas) that the backend provides to the frontend for mobile app development. These models are designed to be clean, efficient, and mobile-friendly.
+
+## 🔐 Authentication Models
+
+### `AuthResponse`
+**Used for**: Login/OAuth response
+```json
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "bearer",
+  "expires_in": 11520,
+  "user": {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "username": "john_doe",
+    "avatar_url": "https://example.com/avatar.jpg",
+    "is_active": true,
+    "created_at": "2024-01-01T12:00:00Z",
+    "updated_at": "2024-01-01T12:00:00Z",
+    "last_login": "2024-01-01T12:00:00Z",
+    "has_google": true,
+    "has_apple": false
+  }
+}
+```
+
+### `GoogleAuthData` / `AppleAuthData`
+**Used for**: OAuth authentication requests
+```json
+// Google
+{
+  "id_token": "google_oauth_token_here"
+}
+
+// Apple
+{
+  "id_token": "apple_oauth_token_here",
+  "authorization_code": "apple_auth_code_here"
+}
+```
+
+## 👤 User Models
+
+### `UserProfile`
+**Used for**: Current user's complete profile
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "username": "john_doe",
+  "avatar_url": "https://example.com/avatar.jpg",
+  "is_active": true,
+  "created_at": "2024-01-01T12:00:00Z",
+  "updated_at": "2024-01-01T12:00:00Z",
+  "last_login": "2024-01-01T12:00:00Z",
+  "has_google": true,
+  "has_apple": false
+}
+```
+
+### `UserPublic`
+**Used for**: Other users' public profiles (author profiles, etc.)
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "username": "jane_author",
+  "avatar_url": "https://example.com/avatar.jpg",
+  "created_at": "2024-01-01T12:00:00Z"
+}
+```
+
+### `UserListItem`
+**Used for**: User search results, author lists
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "username": "search_result_user",
+  "avatar_url": "https://example.com/avatar.jpg"
+}
+```
+
+### `UsernameCheck`
+**Used for**: Username availability validation
+```json
+{
+  "username": "desired_username",
+  "available": false,
+  "suggestions": ["desired_username1", "desired_username_2", "desired_username2024"]
+}
+```
+
+### `UserUpdate`
+**Used for**: Updating user profile
+```json
+{
+  "username": "new_username",
+  "avatar_url": "https://example.com/new_avatar.jpg"
+}
+```
+
+## 📊 Dashboard Models
+
+### `UserStats`
+**Used for**: User statistics dashboard
+```json
+{
+  "total_ebooks": 12,
+  "total_collections": 3,
+  "total_shares": 45,
+  "total_reading_progress": 8,
+  "recent_activity_count": 5
+}
+```
+
+### `UserDashboard`
+**Used for**: Complete dashboard data
+```json
+{
+  "profile": { /* UserProfile object */ },
+  "stats": { /* UserStats object */ },
+  "recent_ebooks": [ /* Array of EbookListItem */ ],
+  "recent_collections": [ /* Array of CollectionListItem */ ]
+}
+```
+
+## 📚 Ebook Models
+
+### `EbookListItem`
+**Used for**: Ebook lists, search results
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "title": "My Amazing Book",
+  "cover_image_url": "https://example.com/cover.jpg",
+  "author": {
+    "id": "123e4567-e89b-12d3-a456-426614174000",
+    "username": "author_name",
+    "avatar_url": "https://example.com/avatar.jpg"
+  },
+  "page_count": 250,
+  "status": "PUBLIC",
+  "download_count": 42,
+  "created_at": "2024-01-01T12:00:00Z"
+}
+```
+
+### `EbookWithAuthor`
+**Used for**: Full ebook details
+```json
+{
+  "id": "123e4567-e89b-12d3-a456-426614174000",
+  "title": "Complete Book Title",
+  "page_count": 250,
+  "status": "PUBLIC",
+  "file_path": "/ebooks/book.epub",
+  "cover_image_path": "/covers/book_cover.jpg",
+  "file_size": 2048576,
+  "download_count": 42,
+  "created_at": "2024-01-01T12:00:00Z",
+  "updated_at": "2024-01-01T12:00:00Z",
+  "author": { /* UserPublic object */ }
+}
+```
+
+## 📱 Mobile App Usage Examples
+
+### 1. **Login Flow**
+```
+POST /api/v1/auth/google
+Body: GoogleAuthData
+Response: AuthResponse
+```
+
+### 2. **Profile Screen**
+```
+GET /api/v1/users/me
+Response: UserProfile
+```
+
+### 3. **Dashboard Screen**
+```
+GET /api/v1/users/me/dashboard
+Response: UserDashboard
+```
+
+### 4. **Username Validation (Real-time)**
+```
+GET /api/v1/users/check-username/desired_name
+Response: UsernameCheck
+```
+
+### 5. **Author Profile**
+```
+GET /api/v1/users/username/author_name
+Response: UserPublic
+```
+
+### 6. **Update Profile**
+```
+PUT /api/v1/users/me
+Body: UserUpdate
+Response: UserProfile
+```
+
+## 🎨 UI/UX Considerations
+
+### Avatar URLs
+- Always provide fallback handling for `null` avatar_url
+- Consider placeholder avatars with user initials
+- Cache avatar images in the mobile app
+
+### Username Display
+- Usernames are unique and can be displayed with `@` prefix
+- Support username editing (check availability first)
+- Show username validation errors in real-time
+
+### OAuth Integration
+- `has_google` and `has_apple` fields help show account linking options
+- Users can link multiple OAuth providers to the same account
+- Show which providers are connected in settings
+
+### Timestamps
+- All timestamps are in ISO 8601 format (UTC)
+- Convert to local time in the mobile app
+- Use relative time display ("2 hours ago", "Yesterday")
+
+### Privacy Status
+- `PUBLIC` - Visible to everyone
+- `PRIVATE` - Only visible to the author
+- `INVITE_ONLY` - Accessible via share links only
+
+## 🔧 Implementation Notes
+
+### Error Handling
+All endpoints return consistent error formats:
+```json
+{
+  "detail": "Error message here",
+  "error_code": "USERNAME_TAKEN",
+  "suggestions": ["alternative_username1", "alternative_username2"]
+}
+```
+
+### Pagination
+List endpoints support pagination:
+```json
+{
+  "items": [/* array of items */],
+  "total": 100,
+  "page": 1,
+  "size": 20,
+  "pages": 5
+}
+```
+
+### Authentication
+- Include JWT token in Authorization header: `Bearer {token}`
+- Token expires in 11520 minutes (8 days)
+- Refresh tokens before expiry
+- Handle 401 responses by redirecting to login 

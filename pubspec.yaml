@@ -1,29 +1,11 @@
-name: app_ui
-description: Shared assets, themes, and UI constants for the Unread application
-version: 0.1.0
+name: unread_frontend
+description: Unread Frontend Monorepo - An ebook sharing platform
+version: 1.0.0+1
+publish_to: 'none'
 
 environment:
   sdk: '>=3.0.0 <4.0.0'
   flutter: '>=3.19.0'
 
-dependencies:
-  flutter:
-    sdk: flutter
-  flutter_gen_core: ^5.8.0
-
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
-  flutter_lints: ^5.0.0
-  flutter_gen_runner: ^5.8.0
-
-flutter:
-  uses-material-design: true
-
-flutter_gen:
-  output: lib/gen/
-  integrations:
-    flutter_svg: true
-    flare_flutter: false
-    rive: false
-    lottie: false 
+  melos: ^6.3.3 

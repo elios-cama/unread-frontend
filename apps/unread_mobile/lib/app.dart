@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:app_ui/app_ui.dart';
 import 'package:common/common.dart';
+import 'src/auth/presentation/page/auth_page.dart';
+import 'src/auth/presentation/page/welcome_back_page.dart';
+import 'src/onboarding/presentation/page/onboarding_page.dart';
 
 class UnreadApp extends ConsumerWidget {
   const UnreadApp({super.key});
@@ -14,8 +17,53 @@ class UnreadApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: ThemeMode.system,
-      home: const HomePage(),
+      home: const AuthFlowPage(),
     );
+  }
+}
+
+class AuthFlowPage extends ConsumerStatefulWidget {
+  const AuthFlowPage({super.key});
+
+  @override
+  ConsumerState<AuthFlowPage> createState() => _AuthFlowPageState();
+}
+
+class _AuthFlowPageState extends ConsumerState<AuthFlowPage> {
+  UserProfile? _mockUser;
+  bool _isNewUser = false;
+
+  @override
+  Widget build(BuildContext context) {
+    // Mock auth flow for development
+    if (_mockUser == null) {
+      return AuthPage(onAuthSuccess: _simulateAuth);
+    }
+
+    if (_isNewUser) {
+      return OnboardingPage(user: _mockUser!);
+    }
+
+    return WelcomeBackPage(user: _mockUser!);
+  }
+
+  void _simulateAuth({required bool isNewUser}) {
+    setState(() {
+      _mockUser = UserProfile(
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        username: isNewUser ? 'newuser123' : 'elliotalderson',
+        avatarUrl: isNewUser ? null : 'https://example.com/avatar.jpg',
+        isActive: true,
+        createdAt: isNewUser
+            ? DateTime.now().toIso8601String()
+            : '2024-01-01T12:00:00Z',
+        updatedAt: DateTime.now().toIso8601String(),
+        lastLogin: DateTime.now().toIso8601String(),
+        hasGoogle: true,
+        hasApple: false,
+      );
+      _isNewUser = isNewUser;
+    });
   }
 }
 
