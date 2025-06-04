@@ -1,6 +1,7 @@
 import 'package:app_ui/resources/resources.dart';
 import 'package:flutter/material.dart';
 import 'unread_asset_widget.dart';
+import 'unread_icon_button_widget.dart';
 
 enum AuthProvider { google, apple }
 
@@ -18,34 +19,15 @@ class AuthButtonWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      height: 56,
-      margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      child: ElevatedButton.icon(
-        onPressed: isLoading ? null : onPressed,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: const Color(0xFF2D2D2D),
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 0,
-        ),
-        icon: isLoading
-            ? const SizedBox(
-                width: 24,
-                height: 24,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                ),
-              )
-            : _buildIcon(),
-        label: Text(
-          _getButtonText(),
-          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-        ),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+      child: UnreadIconButton(
+        text: _getButtonText(),
+        icon: _buildIcon(),
+        onPressed: onPressed,
+        isLoading: isLoading,
+        backgroundColor: const Color(0xFF2D2D2D),
+        textColor: Colors.white,
       ),
     );
   }
@@ -54,7 +36,7 @@ class AuthButtonWidget extends StatelessWidget {
     switch (provider) {
       case AuthProvider.google:
         return const UnreadAsset(
-          path: IconsSvg.icGoogle,
+          path: IconAssets.icGoogle,
           width: 24,
           height: 24,
         );

@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:design_ui/design_ui.dart';
 import 'package:common/common.dart';
+import '../../../../core/router/route_constants.dart';
 
 class WelcomeBackPage extends ConsumerWidget {
   const WelcomeBackPage({super.key, required this.user});
 
-  final UserProfile user;
+  final Map<String, dynamic> user;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final userProfile = UserProfile.fromJson(user);
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: SafeArea(
@@ -30,7 +34,7 @@ class WelcomeBackPage extends ConsumerWidget {
               Text(
                 'You\'re signed in and ready to go.',
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                  color: Colors.white.withValues(alpha: 0.7),
                   fontSize: 16,
                 ),
               ),
@@ -45,57 +49,55 @@ class WelcomeBackPage extends ConsumerWidget {
                   children: [
                     const BookIconWidget(
                       size: 120,
-                      primaryColor: Color(0xFF06B6D4),
-                      secondaryColor: Color(0xFF3B82F6),
+                      useBlueBook: true,
                     ),
                     const SizedBox(height: 24),
                     Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Container(
                           width: 32,
                           height: 32,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: user.avatarUrl != null
+                            color: userProfile.avatarUrl != null
                                 ? Colors.transparent
                                 : const Color(0xFF6366F1),
                           ),
-                          child: user.avatarUrl != null
+                          child: userProfile.avatarUrl != null
                               ? ClipOval(
                                   child: Image.network(
-                                    user.avatarUrl!,
+                                    userProfile.avatarUrl!,
                                     width: 32,
                                     height: 32,
                                     fit: BoxFit.cover,
                                     errorBuilder:
                                         (context, error, stackTrace) =>
-                                            _buildFallbackAvatar(),
+                                            _buildFallbackAvatar(userProfile),
                                   ),
                                 )
-                              : _buildFallbackAvatar(),
+                              : _buildFallbackAvatar(userProfile),
                         ),
                         const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                user.username,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              userProfile.username,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
                               ),
-                              Text(
-                                'Joined ${_formatJoinDate(user.createdAt)}',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.6),
-                                  fontSize: 14,
-                                ),
+                            ),
+                            Text(
+                              'Joined ${_formatJoinDate(userProfile.createdAt)}',
+                              style: TextStyle(
+                                color: Colors.white.withValues(alpha: 0.6),
+                                fontSize: 14,
                               ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -103,24 +105,11 @@ class WelcomeBackPage extends ConsumerWidget {
                 ),
               ),
               const Spacer(flex: 3),
-              Container(
-                width: double.infinity,
-                height: 56,
-                child: ElevatedButton(
-                  onPressed: () => _enterApp(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.white,
-                    foregroundColor: Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'Enter App',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                  ),
-                ),
+              UnreadButton(
+                text: 'Enter App',
+                onPressed: () => _enterApp(context),
+                backgroundColor: Colors.white,
+                textColor: Colors.black,
               ),
             ],
           ),
@@ -129,19 +118,21 @@ class WelcomeBackPage extends ConsumerWidget {
     );
   }
 
-  Widget _buildFallbackAvatar() {
+  Widget _buildFallbackAvatar(UserProfile userProfile) {
     return Container(
       width: 32,
       height: 32,
       decoration: const BoxDecoration(
         shape: BoxShape.circle,
-        color: Color(0xFF6366F1),
+        color: Color(0xFFcdd7da),
       ),
       child: Center(
         child: Text(
-          user.username.isNotEmpty ? user.username[0].toUpperCase() : 'U',
+          userProfile.username.isNotEmpty
+              ? userProfile.username[0].toUpperCase()
+              : 'U',
           style: const TextStyle(
-            color: Colors.white,
+            color: Colors.black,
             fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
@@ -171,7 +162,6 @@ class WelcomeBackPage extends ConsumerWidget {
   }
 
   void _enterApp(BuildContext context) {
-    // TODO: Navigate to main app
-    debugPrint('Entering main app for user: ${user.username}');
+    context.go(AppRoutes.home);
   }
 }

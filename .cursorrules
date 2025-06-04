@@ -178,6 +178,7 @@ The webapp is designed for web browsers with responsive design principles:
 - Show loading indicators
 - Handle errors gracefully and show user-friendly error messages
 - for colors don't use withOpacity but .withValues(alpha:value)
+- for freezed models you need to make classes abstract by default
 
 ## Naming Conventions
 

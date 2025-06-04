@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:design_ui/design_ui.dart';
+import 'package:common/common.dart';
+import '../../../../core/router/route_constants.dart';
 
 class AuthPage extends ConsumerWidget {
-  const AuthPage({super.key, this.onAuthSuccess});
-
-  final Function({required bool isNewUser})? onAuthSuccess;
+  const AuthPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -23,8 +24,6 @@ class AuthPage extends ConsumerWidget {
                     const Spacer(flex: 2),
                     const BookIconWidget(
                       size: 140,
-                      primaryColor: Color(0xFF6366F1),
-                      secondaryColor: Color(0xFF8B5CF6),
                     ),
                     const SizedBox(height: 48),
                     const Text(
@@ -58,51 +57,45 @@ class AuthPage extends ConsumerWidget {
                 children: [
                   AuthButtonWidget(
                     provider: AuthProvider.apple,
-                    onPressed: () => _handleAppleAuth(ref),
+                    onPressed: () => _handleAppleAuth(context, ref),
                   ),
                   AuthButtonWidget(
                     provider: AuthProvider.google,
-                    onPressed: () => _handleGoogleAuth(ref),
+                    onPressed: () => _handleGoogleAuth(context, ref),
                   ),
                   const SizedBox(height: 16),
                   // Development buttons for testing
-                  if (onAuthSuccess != null) ...[
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 24),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () => onAuthSuccess!(isNewUser: true),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                side: const BorderSide(color: Colors.white),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: const Text('Mock New User'),
-                            ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: UnreadButton(
+                            text: 'Mock New User',
+                            onPressed: () => _simulateNewUser(context),
+                            backgroundColor: Colors.transparent,
+                            textColor: Colors.white,
+                            borderColor: Colors.white,
+                            borderWidth: 1,
+                            borderRadius: 8,
                           ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: OutlinedButton(
-                              onPressed: () => onAuthSuccess!(isNewUser: false),
-                              style: OutlinedButton.styleFrom(
-                                foregroundColor: Colors.white,
-                                side: const BorderSide(color: Colors.white),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: const Text('Mock Returning'),
-                            ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: UnreadButton(
+                            text: 'Mock Returning',
+                            onPressed: () => _simulateReturningUser(context),
+                            backgroundColor: Colors.transparent,
+                            textColor: Colors.white,
+                            borderColor: Colors.white,
+                            borderWidth: 1,
+                            borderRadius: 8,
                           ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 16),
-                  ],
+                  ),
+                  const SizedBox(height: 16),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: RichText(
@@ -143,15 +136,47 @@ class AuthPage extends ConsumerWidget {
     );
   }
 
-  void _handleAppleAuth(WidgetRef ref) {
+  void _handleAppleAuth(BuildContext context, WidgetRef ref) {
     // TODO: Implement Apple authentication
     debugPrint('Apple authentication triggered');
-    onAuthSuccess?.call(isNewUser: false);
+    _simulateReturningUser(context);
   }
 
-  void _handleGoogleAuth(WidgetRef ref) {
+  void _handleGoogleAuth(BuildContext context, WidgetRef ref) {
     // TODO: Implement Google authentication
     debugPrint('Google authentication triggered');
-    onAuthSuccess?.call(isNewUser: true);
+    _simulateNewUser(context);
+  }
+
+  void _simulateNewUser(BuildContext context) {
+    final mockUser = UserProfile(
+      id: '123e4567-e89b-12d3-a456-426614174000',
+      username: 'newuser123',
+      avatarUrl: null,
+      isActive: true,
+      createdAt: DateTime.now().toIso8601String(),
+      updatedAt: DateTime.now().toIso8601String(),
+      lastLogin: DateTime.now().toIso8601String(),
+      hasGoogle: true,
+      hasApple: false,
+    );
+
+    context.go(AppRoutes.onboarding, extra: mockUser.toJson());
+  }
+
+  void _simulateReturningUser(BuildContext context) {
+    final mockUser = UserProfile(
+      id: '123e4567-e89b-12d3-a456-426614174000',
+      username: 'elliotalderson',
+      avatarUrl: 'https://example.com/avatar.jpg',
+      isActive: true,
+      createdAt: '2024-01-01T12:00:00Z',
+      updatedAt: DateTime.now().toIso8601String(),
+      lastLogin: DateTime.now().toIso8601String(),
+      hasGoogle: true,
+      hasApple: false,
+    );
+
+    context.go(AppRoutes.welcomeBack, extra: mockUser.toJson());
   }
 }

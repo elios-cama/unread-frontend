@@ -31,5 +31,11 @@ package: resources
 
 groups:
   - path: assets/images/icons
-    class_name: IconsSvg
-    types: [.svg]
+    class_name: IconAssets
+    types: [.svg, .png]
+  - path: assets/images/books
+    class_name: Books
+    types: [.svg, .png]
+  - path: assets/animations/lottie
+    class_name: LottieAssets
+    types: [.json]

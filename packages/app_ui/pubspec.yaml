@@ -14,6 +14,7 @@ dependencies:
   path: ^1.9.0
   flutter_svg: ^2.1.0
   flutter_gen_core: ^5.8.0
+  lottie: ^3.3.1
 
 dev_dependencies:
   flutter_test:
@@ -29,3 +30,5 @@ flutter:
   assets:
     - assets/images/
     - assets/images/icons/
+    - assets/images/books/
+    - assets/animations/lottie/
