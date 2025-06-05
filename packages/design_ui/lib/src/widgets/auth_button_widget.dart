@@ -41,7 +41,15 @@ class AuthButtonWidget extends StatelessWidget {
           height: 24,
         );
       case AuthProvider.apple:
-        return const Icon(Icons.apple, size: 24, color: Colors.white);
+        return const UnreadAsset(
+          path: IconAssets.icApple,
+          width: 24,
+          height: 24,
+          colorFilter: ColorFilter.mode(
+            Colors.white,
+            BlendMode.srcIn,
+          ),
+        );
     }
   }
 

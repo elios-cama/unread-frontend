@@ -7,6 +7,7 @@ import '../../src/onboarding/presentation/page/onboarding_page.dart';
 import '../../src/auth/presentation/page/welcome_back_page.dart';
 import '../../src/landing/presentation/page/landing_page.dart';
 import '../../src/home/presentation/page/home_page.dart';
+import '../../src/collections/presentation/page/collection_detail_page.dart';
 import 'route_constants.dart';
 
 part 'app_router.g.dart';
@@ -53,6 +54,21 @@ GoRouter appRouter(AppRouterRef ref) {
         path: AppRoutes.home,
         name: AppRoutes.homeName,
         builder: (context, state) => const HomePage(),
+      ),
+      GoRoute(
+        path: AppRoutes.collection,
+        name: AppRoutes.collectionName,
+        builder: (context, state) {
+          final collectionId = state.pathParameters['collectionId'];
+          if (collectionId == null) {
+            return const Scaffold(
+              body: Center(
+                child: Text('Collection ID is required'),
+              ),
+            );
+          }
+          return CollectionDetailPage(collectionId: collectionId);
+        },
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

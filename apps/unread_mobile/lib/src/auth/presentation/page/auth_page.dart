@@ -64,38 +64,38 @@ class AuthPage extends ConsumerWidget {
                     onPressed: () => _handleGoogleAuth(context, ref),
                   ),
                   const SizedBox(height: 16),
-                  // Development buttons for testing
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 24),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: UnreadButton(
-                            text: 'Mock New User',
-                            onPressed: () => _simulateNewUser(context),
-                            backgroundColor: Colors.transparent,
-                            textColor: Colors.white,
-                            borderColor: Colors.white,
-                            borderWidth: 1,
-                            borderRadius: 8,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: UnreadButton(
-                            text: 'Mock Returning',
-                            onPressed: () => _simulateReturningUser(context),
-                            backgroundColor: Colors.transparent,
-                            textColor: Colors.white,
-                            borderColor: Colors.white,
-                            borderWidth: 1,
-                            borderRadius: 8,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
+                  // // Development buttons for testing
+                  // Padding(
+                  //   padding: const EdgeInsets.symmetric(horizontal: 24),
+                  //   child: Row(
+                  //     children: [
+                  //       Expanded(
+                  //         child: UnreadButton(
+                  //           text: 'Mock New User',
+                  //           onPressed: () => _simulateNewUser(context),
+                  //           backgroundColor: Colors.transparent,
+                  //           textColor: Colors.white,
+                  //           borderColor: Colors.white,
+                  //           borderWidth: 1,
+                  //           borderRadius: 8,
+                  //         ),
+                  //       ),
+                  //       const SizedBox(width: 8),
+                  //       Expanded(
+                  //         child: UnreadButton(
+                  //           text: 'Mock Returning',
+                  //           onPressed: () => _simulateReturningUser(context),
+                  //           backgroundColor: Colors.transparent,
+                  //           textColor: Colors.white,
+                  //           borderColor: Colors.white,
+                  //           borderWidth: 1,
+                  //           borderRadius: 8,
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 16),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: RichText(

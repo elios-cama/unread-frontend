@@ -36,6 +36,9 @@ groups:
   - path: assets/images/books
     class_name: Books
     types: [.svg, .png]
+  - path: assets/images/books/generated
+    class_name: BooksGenerated
+    types: [.svg, .png]
   - path: assets/animations/lottie
     class_name: LottieAssets
     types: [.json]

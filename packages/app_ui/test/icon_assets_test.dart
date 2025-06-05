@@ -5,6 +5,7 @@ import 'package:app_ui/resources/icon_assets.dart';
 
 void main() {
   test('icon_assets assets test', () {
+    expect(File(IconAssets.icApple).existsSync(), isTrue);
     expect(File(IconAssets.icGoogle).existsSync(), isTrue);
   });
 }

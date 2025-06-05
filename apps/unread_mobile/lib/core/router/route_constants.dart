@@ -13,4 +13,13 @@ class AppRoutes {
 
   static const String home = '/home';
   static const String homeName = 'home';
+
+  static const String collections = '/collections';
+  static const String collectionsName = 'collections';
+
+  static const String collection = '/collection/:collectionId';
+  static const String collectionName = 'collection';
+
+  static const String ebook = '/ebook/:ebookId';
+  static const String ebookName = 'ebook';
 }
