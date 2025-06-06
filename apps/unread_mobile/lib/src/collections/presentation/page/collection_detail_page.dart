@@ -6,7 +6,7 @@ import 'package:design_ui/design_ui.dart';
 import '../../../../core/router/route_constants.dart';
 import '../widget/ebook_card_widget.dart';
 
-class CollectionDetailPage extends ConsumerWidget {
+class CollectionDetailPage extends ConsumerStatefulWidget {
   final String collectionId;
 
   const CollectionDetailPage({
@@ -15,16 +15,200 @@ class CollectionDetailPage extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final collectionAsync = ref.watch(collectionDetailsProvider(collectionId));
+  ConsumerState<CollectionDetailPage> createState() =>
+      _CollectionDetailPageState();
+}
+
+class _CollectionDetailPageState extends ConsumerState<CollectionDetailPage>
+    with TickerProviderStateMixin {
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+  ScrollController? _scrollController;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+          parent: _animationController, curve: Curves.easeInOutCubic),
+    );
+    // Delay the animation to sync with page transition
+    Future.delayed(const Duration(milliseconds: 200), () {
+      if (mounted) {
+        _animationController.forward();
+      }
+    });
+    _scrollController = ScrollController();
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _scrollController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final collectionAsync =
+        ref.watch(collectionDetailsProvider(widget.collectionId));
 
     return Scaffold(
       backgroundColor: Colors.black,
-      body: SafeArea(
-        child: collectionAsync.when(
-          data: (collection) => _buildCollectionContent(context, collection),
-          loading: () => _buildLoadingState(),
-          error: (error, stack) => _buildErrorState(error.toString(), context),
+      extendBodyBehindAppBar: true,
+      extendBody: true,
+      appBar: _buildAnimatedAppBar(collectionAsync),
+      body: collectionAsync.when(
+        data: (collection) => _buildCollectionContent(context, collection),
+        loading: () => _buildLoadingState(),
+        error: (error, stack) => _buildErrorState(error.toString(), context),
+      ),
+      floatingActionButton: _buildFloatingActionButton(),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
+  }
+
+  PreferredSizeWidget _buildAnimatedAppBar(
+      AsyncValue<CollectionWithEbooks> collectionAsync) {
+    return PreferredSize(
+      preferredSize: const Size.fromHeight(50),
+      child: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              Colors.black,
+              Colors.transparent,
+            ],
+            stops: [0.8, 1.0],
+          ),
+        ),
+        child: AppBar(
+          surfaceTintColor: Colors.transparent,
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          toolbarHeight: 50,
+          automaticallyImplyLeading: false,
+          title: GestureDetector(
+            onTap: () {
+              _animationController.reverse().then((_) {
+                context.pop();
+              });
+            },
+            child: Row(
+              children: [
+                const Text(
+                  '[u]',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                Expanded(
+                  child: AnimatedBuilder(
+                    animation: _fadeAnimation,
+                    child: collectionAsync.when(
+                      data: (collection) => Text(
+                        ' / ${collection.name}',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.6),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      loading: () => Text(
+                        ' / ...',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.6),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                      error: (_, __) => Text(
+                        ' / error',
+                        style: TextStyle(
+                          color: Colors.white.withValues(alpha: 0.6),
+                          fontSize: 20,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
+                      ),
+                    ),
+                    builder: (context, child) {
+                      return Opacity(
+                        opacity: _fadeAnimation.value,
+                        child: child,
+                      );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            SizedBox(
+              width: 34,
+              height: 34,
+              child: IconButton(
+                style: IconButton.styleFrom(
+                  backgroundColor: Colors.grey[800],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+                alignment: Alignment.center,
+                onPressed: () => _showCollectionMenu(context),
+                icon:
+                    const Icon(Icons.more_horiz, color: Colors.white, size: 18),
+              ),
+            ),
+            const SizedBox(width: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFloatingActionButton() {
+    return SizedBox(
+      width: 120,
+      height: 48,
+      child: FloatingActionButton.extended(
+        onPressed: () => _uploadBook(),
+        backgroundColor: Colors.grey[800],
+        foregroundColor: Colors.white,
+        elevation: 8,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        label: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.add,
+              size: 20,
+            ),
+            SizedBox(width: 6),
+            Text(
+              'Add',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -32,150 +216,78 @@ class CollectionDetailPage extends ConsumerWidget {
 
   Widget _buildCollectionContent(
       BuildContext context, CollectionWithEbooks collection) {
-    return CustomScrollView(
-      slivers: [
-        SliverAppBar(
-          backgroundColor: Colors.black,
-          expandedHeight: 120,
-          floating: false,
-          pinned: true,
-          leading: IconButton(
-            onPressed: () => context.pop(),
-            icon: const Icon(Icons.arrow_back, color: Colors.white),
-          ),
-          actions: [
-            IconButton(
-              onPressed: () => _showCollectionMenu(context),
-              icon: const Icon(Icons.more_vert, color: Colors.white),
-            ),
-          ],
-          flexibleSpace: FlexibleSpaceBar(
-            title: Text(
-              collection.name,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            titlePadding: const EdgeInsets.only(left: 56, bottom: 16),
-          ),
-        ),
-        SliverToBoxAdapter(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildCollectionInfo(collection),
-                const SizedBox(height: 24),
-                _buildSectionHeader('${collection.ebooks.length} ebooks'),
-              ],
-            ),
-          ),
-        ),
-        if (collection.ebooks.isEmpty)
-          SliverFillRemaining(
-            child: _buildEmptyEbooksState(),
-          )
-        else
-          SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            sliver: SliverGrid(
+    if (collection.ebooks.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.only(top: 66),
+        child: _buildEmptyEbooksState(),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: 28,
+      ),
+      child: Column(
+        children: [
+          Expanded(
+            child: GridView.builder(
+              controller: _scrollController,
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
                 crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.7,
+                mainAxisSpacing: 20,
+                childAspectRatio: 0.75,
               ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final ebook = collection.ebooks[index];
-                  return EbookCardWidget(
-                    ebook: ebook,
-                    onTap: () => context.pushNamed(
-                      AppRoutes.ebookName,
-                      pathParameters: {'ebookId': ebook.id},
+              itemCount: collection.ebooks.length,
+              itemBuilder: (context, index) {
+                final ebook = collection.ebooks[index];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: EbookCardWidget(
+                        ebook: ebook,
+                        onTap: () => context.pushNamed(
+                          AppRoutes.ebookName,
+                          pathParameters: {'ebookId': ebook.id},
+                        ),
+                      ),
                     ),
-                  );
-                },
-                childCount: collection.ebooks.length,
-              ),
+                    const SizedBox(height: 8),
+                    Text(
+                      ebook.title,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      '@${ebook.author.username}',
+                      style: TextStyle(
+                        color: Colors.white.withValues(alpha: 0.6),
+                        fontSize: 12,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                );
+              },
             ),
           ),
-        const SliverToBoxAdapter(
-          child: SizedBox(height: 32),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCollectionInfo(CollectionWithEbooks collection) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.grey[900],
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: _getStatusColor(collection.status).withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: _getStatusColor(collection.status),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  _getStatusText(collection.status),
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              const Spacer(),
-              Text(
-                '@${collection.author.username}',
-                style: TextStyle(
-                  color: Colors.white.withValues(alpha: 0.7),
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          if (collection.description != null) ...[
-            const SizedBox(height: 12),
-            Text(
-              collection.description!,
-              style: TextStyle(
-                color: Colors.white.withValues(alpha: 0.8),
-                fontSize: 14,
-                height: 1.4,
-              ),
-            ),
-          ],
         ],
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 18,
-        fontWeight: FontWeight.w600,
-      ),
-    );
+  void _uploadBook() {
+    // TODO: Navigate to book upload
   }
 
   Widget _buildLoadingState() {
@@ -259,62 +371,6 @@ class CollectionDetailPage extends ConsumerWidget {
   }
 
   void _showCollectionMenu(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.grey[900],
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              leading: const Icon(Icons.share, color: Colors.white),
-              title: const Text(
-                'Share Collection',
-                style: TextStyle(color: Colors.white),
-              ),
-              onTap: () => Navigator.pop(context),
-            ),
-            ListTile(
-              leading: const Icon(Icons.edit, color: Colors.white),
-              title: const Text(
-                'Edit Collection',
-                style: TextStyle(color: Colors.white),
-              ),
-              onTap: () => Navigator.pop(context),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Color _getStatusColor(String status) {
-    switch (status.toLowerCase()) {
-      case 'public':
-        return Colors.green;
-      case 'private':
-        return Colors.orange;
-      case 'invite_only':
-        return Colors.blue;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  String _getStatusText(String status) {
-    switch (status.toLowerCase()) {
-      case 'public':
-        return 'PUBLIC';
-      case 'private':
-        return 'PRIVATE';
-      case 'invite_only':
-        return 'INVITE ONLY';
-      default:
-        return 'UNKNOWN';
-    }
+    // TODO: Implement collection menu
   }
 }

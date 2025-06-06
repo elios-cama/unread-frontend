@@ -14,41 +14,62 @@ class HomePage extends ConsumerWidget {
     final collectionsAsync = ref.watch(collectionsListProvider());
 
     return Scaffold(
-      backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
-        title: const Text(
-          'Unread',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 24,
-            fontWeight: FontWeight.w700,
+      extendBodyBehindAppBar: true,
+      extendBody: true,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(50),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black,
+                Colors.transparent,
+              ],
+              stops: [0.8, 1.0],
+            ),
+          ),
+          child: AppBar(
+            surfaceTintColor: Colors.transparent,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            toolbarHeight: 50,
+            title: Row(
+              children: [
+                const Text(
+                  'Unread',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              IconButton(
+                onPressed: () => _showSignOutDialog(context),
+                icon: const Icon(Icons.logout, color: Colors.white),
+              ),
+            ],
           ),
         ),
-        actions: [
-          IconButton(
-            onPressed: () => _showSignOutDialog(context),
-            icon: const Icon(Icons.logout, color: Colors.white),
+      ),
+      body: Stack(
+        children: [
+          collectionsAsync.when(
+            data: (collectionsResponse) =>
+                _buildHomeContent(context, collectionsResponse),
+            loading: () => _buildLoadingState(),
+            error: (error, stack) => _buildErrorState(error.toString()),
+          ),
+          Positioned(
+            bottom: 24,
+            left: MediaQuery.of(context).size.width / 2 - 60,
+            child: _buildFloatingButton(),
           ),
         ],
-      ),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            collectionsAsync.when(
-              data: (collectionsResponse) =>
-                  _buildHomeContent(context, collectionsResponse),
-              loading: () => _buildLoadingState(),
-              error: (error, stack) => _buildErrorState(error.toString()),
-            ),
-            Positioned(
-              bottom: 24,
-              left: MediaQuery.of(context).size.width / 2 - 60,
-              child: _buildFloatingButton(),
-            ),
-          ],
-        ),
       ),
     );
   }

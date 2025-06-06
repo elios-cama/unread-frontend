@@ -59,43 +59,7 @@ class AuthPage extends ConsumerWidget {
                     provider: AuthProvider.apple,
                     onPressed: () => _handleAppleAuth(context, ref),
                   ),
-                  AuthButtonWidget(
-                    provider: AuthProvider.google,
-                    onPressed: () => _handleGoogleAuth(context, ref),
-                  ),
                   const SizedBox(height: 16),
-                  // // Development buttons for testing
-                  // Padding(
-                  //   padding: const EdgeInsets.symmetric(horizontal: 24),
-                  //   child: Row(
-                  //     children: [
-                  //       Expanded(
-                  //         child: UnreadButton(
-                  //           text: 'Mock New User',
-                  //           onPressed: () => _simulateNewUser(context),
-                  //           backgroundColor: Colors.transparent,
-                  //           textColor: Colors.white,
-                  //           borderColor: Colors.white,
-                  //           borderWidth: 1,
-                  //           borderRadius: 8,
-                  //         ),
-                  //       ),
-                  //       const SizedBox(width: 8),
-                  //       Expanded(
-                  //         child: UnreadButton(
-                  //           text: 'Mock Returning',
-                  //           onPressed: () => _simulateReturningUser(context),
-                  //           backgroundColor: Colors.transparent,
-                  //           textColor: Colors.white,
-                  //           borderColor: Colors.white,
-                  //           borderWidth: 1,
-                  //           borderRadius: 8,
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
-                  // const SizedBox(height: 16),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32),
                     child: RichText(
@@ -140,28 +104,6 @@ class AuthPage extends ConsumerWidget {
     // TODO: Implement Apple authentication
     debugPrint('Apple authentication triggered');
     _simulateReturningUser(context);
-  }
-
-  void _handleGoogleAuth(BuildContext context, WidgetRef ref) {
-    // TODO: Implement Google authentication
-    debugPrint('Google authentication triggered');
-    _simulateNewUser(context);
-  }
-
-  void _simulateNewUser(BuildContext context) {
-    final mockUser = UserProfile(
-      id: '123e4567-e89b-12d3-a456-426614174000',
-      username: 'newuser123',
-      avatarUrl: null,
-      isActive: true,
-      createdAt: DateTime.now().toIso8601String(),
-      updatedAt: DateTime.now().toIso8601String(),
-      lastLogin: DateTime.now().toIso8601String(),
-      hasGoogle: true,
-      hasApple: false,
-    );
-
-    context.go(AppRoutes.onboarding, extra: mockUser.toJson());
   }
 
   void _simulateReturningUser(BuildContext context) {

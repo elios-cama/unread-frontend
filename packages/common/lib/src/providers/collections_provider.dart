@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../data_source/collections_remote_data_source.dart';
 import '../repository/collections_repository.dart';
@@ -8,20 +9,20 @@ import '../models/models.dart';
 part 'collections_provider.g.dart';
 
 @riverpod
-Dio dio(DioRef ref) {
+Dio dio(Ref ref) {
   return Dio();
 }
 
 @riverpod
 CollectionsRemoteDataSource collectionsRemoteDataSource(
-  CollectionsRemoteDataSourceRef ref,
+  Ref ref,
 ) {
   final dio = ref.watch(dioProvider);
   return CollectionsRemoteDataSourceImpl(dio);
 }
 
 @riverpod
-CollectionsRepository collectionsRepository(CollectionsRepositoryRef ref) {
+CollectionsRepository collectionsRepository(Ref ref) {
   final remoteDataSource = ref.watch(collectionsRemoteDataSourceProvider);
   return CollectionsRepositoryImpl(remoteDataSource);
 }

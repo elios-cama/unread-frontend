@@ -1,5 +1,3 @@
-// TODO: Put public facing types in this file.
-
 export 'models/models.dart';
 export 'repository/collections_repository.dart';
 export 'repository/ebooks_repository.dart';
