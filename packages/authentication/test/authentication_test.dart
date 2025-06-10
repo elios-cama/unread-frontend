@@ -1,4 +1,4 @@
-import 'package:authentication/authentication.dart';
+import 'package:authentication/src/authentication_base.dart';
 import 'package:test/test.dart';
 
 void main() {

@@ -1,6 +1,7 @@
 name: authentication
-description: A starting point for Dart libraries or applications.
+description: Shared authentication logic (OAuth, JWT) for Unread applications
 version: 1.0.0
+publish_to: 'none'
 # repository: https://github.com/my_org/my_repo
 
 environment:
@@ -8,8 +9,24 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
-  # path: ^1.8.0
+  flutter:
+    sdk: flutter
+  supabase_flutter: ^2.9.0
+  sign_in_with_apple: ^7.0.1
+  flutter_riverpod: ^2.6.1
+  riverpod_annotation: ^2.6.1
+  dio: ^5.8.0+1
+  freezed_annotation: ^3.0.0
+  json_annotation: ^4.9.0
+  flutter_secure_storage: ^9.2.2
+  
+  common:
+    path: ../common
 
 dev_dependencies:
   lints: ^5.0.0
   test: ^1.24.0
+  build_runner: ^2.4.15
+  riverpod_generator: ^2.6.0
+  freezed: ^3.0.6
+  json_serializable: ^6.8.0

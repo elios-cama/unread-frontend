@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:design_ui/design_ui.dart';
 import 'package:common/common.dart';
 import '../../../../core/router/route_constants.dart';
+import '../../../auth/presentation/provider/auth_provider.dart';
 
 class LandingPage extends ConsumerStatefulWidget {
   const LandingPage({super.key});
@@ -23,16 +24,21 @@ class _LandingPageState extends ConsumerState<LandingPage> {
 
   Future<void> _handleAuthRedirection() async {
     try {
-      // TODO: Implement actual auth check with secure storage and API
-      // For now, simulate auth check for development
-      await Future.delayed(const Duration(seconds: 2));
+      // Check if user is already authenticated
+      final authNotifier = ref.read(authProvider.notifier);
+      final storedUser = await authNotifier.checkAndUpdateStoredAuth();
 
       if (!mounted) return;
 
-      // For development, always redirect to auth page
-      // In production, this would check stored credentials/tokens
-      context.go(AppRoutes.auth);
+      if (storedUser != null) {
+        // User is authenticated, go directly to home
+        context.go(AppRoutes.home);
+      } else {
+        // User is not authenticated, go to auth page
+        context.go(AppRoutes.auth);
+      }
     } catch (e) {
+      // If there's an error checking auth, go to auth page
       if (mounted) {
         context.go(AppRoutes.auth);
       }

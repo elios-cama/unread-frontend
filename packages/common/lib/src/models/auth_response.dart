@@ -17,9 +17,9 @@ abstract class AuthResponse with _$AuthResponse {
       _$AuthResponseFromJson(json);
 
   factory AuthResponse.empty() => AuthResponse(
-    accessToken: '',
-    tokenType: 'bearer',
-    expiresIn: 0,
-    user: UserProfile.empty(),
-  );
+        accessToken: '',
+        tokenType: 'bearer',
+        expiresIn: 0,
+        user: UserProfile.empty(),
+      );
 }

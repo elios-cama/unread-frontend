@@ -39,6 +39,24 @@ class AppConfig {
     }
   }
 
+  static String get supabaseUrl {
+    switch (_currentFlavor) {
+      case AppFlavor.staging:
+        return StagingEnv.supabaseUrl;
+      case AppFlavor.production:
+        return ProductionEnv.supabaseUrl;
+    }
+  }
+
+  static String get supabaseAnonKey {
+    switch (_currentFlavor) {
+      case AppFlavor.staging:
+        return StagingEnv.supabaseAnonKey;
+      case AppFlavor.production:
+        return ProductionEnv.supabaseAnonKey;
+    }
+  }
+
   static bool get isDebug => _currentFlavor == AppFlavor.staging;
   static bool get isProduction => _currentFlavor == AppFlavor.production;
 }

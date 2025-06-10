@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:common/common.dart';
 import 'package:design_ui/design_ui.dart';
+import 'package:unread_mobile/src/auth/presentation/provider/auth_provider.dart';
+import 'package:unread_mobile/src/auth/domain/model/auth_state_model.dart';
 import '../../../../core/router/route_constants.dart';
 import '../../../collections/presentation/widget/collection_card_widget.dart';
 
@@ -12,6 +14,18 @@ class HomePage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final collectionsAsync = ref.watch(collectionsListProvider());
+
+    // Listen for auth state changes and redirect if unauthenticated
+    ref.listen(authProvider, (previous, next) {
+      if (next.status == AuthStatus.unauthenticated) {
+        debugPrint('🔄 Auth state changed to unauthenticated, redirecting...');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (context.mounted) {
+            context.go(AppRoutes.auth);
+          }
+        });
+      }
+    });
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -49,7 +63,7 @@ class HomePage extends ConsumerWidget {
             ),
             actions: [
               IconButton(
-                onPressed: () => _showSignOutDialog(context),
+                onPressed: () => _showSignOutDialog(context, ref),
                 icon: const Icon(Icons.logout, color: Colors.white),
               ),
             ],
@@ -67,14 +81,14 @@ class HomePage extends ConsumerWidget {
           Positioned(
             bottom: 24,
             left: MediaQuery.of(context).size.width / 2 - 60,
-            child: _buildFloatingButton(),
+            child: _buildFloatingButton(ref),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFloatingButton() {
+  Widget _buildFloatingButton(WidgetRef ref) {
     return Container(
       width: 120,
       height: 48,
@@ -92,7 +106,7 @@ class HomePage extends ConsumerWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => _uploadBook(),
+          onTap: () => _uploadBook(ref),
           borderRadius: BorderRadius.circular(24),
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -278,11 +292,11 @@ class HomePage extends ConsumerWidget {
     );
   }
 
-  void _uploadBook() {
-    // TODO: Navigate to book upload
+  void _uploadBook(WidgetRef ref) {
+    // ref.read(authProvider.notifier).getStoredUser();
   }
 
-  void _showSignOutDialog(BuildContext context) {
+  void _showSignOutDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       builder: (context) => UnreadDialog(
@@ -295,9 +309,15 @@ class HomePage extends ConsumerWidget {
           ),
           UnreadDialogAction(
             text: 'Sign Out',
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(context).pop();
-              context.go(AppRoutes.landing);
+
+              debugPrint('🔄 Starting sign out process...');
+
+              // Sign out - the auth state listener will handle navigation
+              await ref.read(authProvider.notifier).signOut();
+
+              debugPrint('✅ Sign out completed');
             },
             isDestructive: true,
             fontWeight: FontWeight.w600,
