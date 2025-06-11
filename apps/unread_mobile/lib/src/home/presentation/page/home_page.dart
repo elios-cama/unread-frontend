@@ -13,7 +13,7 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final collectionsAsync = ref.watch(collectionsListProvider());
+    final collectionsAsync = ref.watch(userCollectionsGridProvider());
 
     // Listen for auth state changes and redirect if unauthenticated
     ref.listen(authProvider, (previous, next) {
@@ -30,6 +30,7 @@ class HomePage extends ConsumerWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       extendBody: true,
+      backgroundColor: Colors.black,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(50),
         child: Container(
@@ -71,10 +72,11 @@ class HomePage extends ConsumerWidget {
         ),
       ),
       body: Stack(
+        fit: StackFit.expand,
         children: [
           collectionsAsync.when(
-            data: (collectionsResponse) =>
-                _buildHomeContent(context, collectionsResponse),
+            data: (collectionsGridResponse) =>
+                _buildHomeContent(context, collectionsGridResponse),
             loading: () => _buildLoadingState(),
             error: (error, stack) => _buildErrorState(error.toString()),
           ),
@@ -133,8 +135,8 @@ class HomePage extends ConsumerWidget {
   }
 
   Widget _buildHomeContent(
-      BuildContext context, CollectionsResponse collectionsResponse) {
-    if (collectionsResponse.items.isEmpty) {
+      BuildContext context, CollectionsGridResponse collectionsGridResponse) {
+    if (collectionsGridResponse.items.isEmpty) {
       return _buildEmptyState();
     }
 
@@ -148,14 +150,14 @@ class HomePage extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildCollectionsSection(context, collectionsResponse.items),
+          _buildCollectionsSection(context, collectionsGridResponse.items),
         ],
       ),
     );
   }
 
   Widget _buildCollectionsSection(
-      BuildContext context, List<CollectionListItem> collections) {
+      BuildContext context, List<CollectionWithPreviews> collections) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -196,7 +198,7 @@ class HomePage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '@${collection.author.username}',
+                  '${collection.ebookCount} books',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.6),
                     fontSize: 12,
@@ -253,42 +255,36 @@ class HomePage extends ConsumerWidget {
   }
 
   Widget _buildEmptyState() {
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 24,
-        bottom: 100,
-      ),
-      child: Column(
-        children: [
-          const Spacer(flex: 2),
-          const BookIconWidget(
-            size: 120,
-            useBlueBook: true,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Spacer(flex: 2),
+        const BookIconWidget(
+          size: 120,
+          useBlueBook: true,
+        ),
+        const SizedBox(height: 32),
+        const Text(
+          'Welcome to Unread!',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
           ),
-          const SizedBox(height: 32),
-          const Text(
-            'Welcome to Unread!',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.w600,
-            ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Your ebook sanctuary is ready.\nStart by uploading your first book.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.7),
+            fontSize: 16,
+            height: 1.4,
           ),
-          const SizedBox(height: 16),
-          Text(
-            'Your ebook sanctuary is ready.\nStart by uploading your first book.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
-              fontSize: 16,
-              height: 1.4,
-            ),
-          ),
-          const Spacer(flex: 3),
-        ],
-      ),
+        ),
+        const Spacer(flex: 3),
+      ],
     );
   }
 

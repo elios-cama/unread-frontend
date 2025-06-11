@@ -1,6 +1,7 @@
 name: common
 description: Shared business logic and models for Unread applications
 version: 1.0.0
+publish_to: none
 
 environment:
   sdk: ">=3.0.0 <4.0.0"
@@ -14,6 +15,8 @@ dependencies:
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0
   envied: ^1.1.1
+  authentication:
+    path: ../authentication
 
 dev_dependencies:
   lints: ^5.0.0

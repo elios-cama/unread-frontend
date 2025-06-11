@@ -19,6 +19,7 @@ dependencies:
   freezed_annotation: ^3.0.0
   json_annotation: ^4.9.0
   flutter_secure_storage: ^9.2.2
+  crypto: ^3.0.6
   
   common:
     path: ../common
