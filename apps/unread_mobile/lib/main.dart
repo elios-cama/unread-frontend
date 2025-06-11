@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:common/common.dart';
+import 'package:authentication/authentication.dart';
 import 'app.dart';
 
-void main() {
-  // Default to staging for main.dart
-  AppConfig.setFlavor(AppFlavor.staging);
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize app with staging flavor and authentication services
+  await AppAuthInitializer.initialize(flavor: AppFlavor.staging);
 
   runApp(const ProviderScope(child: UnreadApp()));
 }

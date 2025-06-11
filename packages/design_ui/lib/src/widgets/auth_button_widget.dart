@@ -21,13 +21,16 @@ class AuthButtonWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-      child: UnreadIconButton(
-        text: _getButtonText(),
-        icon: _buildIcon(),
-        onPressed: onPressed,
-        isLoading: isLoading,
-        backgroundColor: const Color(0xFF2D2D2D),
-        textColor: Colors.white,
+      child: SizedBox(
+        width: double.infinity,
+        child: UnreadIconButton(
+          text: _getButtonText(),
+          icon: _buildIcon(),
+          onPressed: onPressed,
+          isLoading: isLoading,
+          backgroundColor: const Color(0xFF2D2D2D),
+          textColor: Colors.white,
+        ),
       ),
     );
   }

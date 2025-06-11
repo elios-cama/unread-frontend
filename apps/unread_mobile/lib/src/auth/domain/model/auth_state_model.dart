@@ -6,6 +6,7 @@ part 'auth_state_model.g.dart';
 
 enum AuthStatus {
   unauthenticated,
+  loading,
   newUser,
   returningUser,
   authenticated,

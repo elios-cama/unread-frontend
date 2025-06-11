@@ -11,7 +11,7 @@ class CollectionsPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final collectionsAsync = ref.watch(collectionsListProvider());
+    final collectionsAsync = ref.watch(userCollectionsGridProvider());
 
     return Scaffold(
       backgroundColor: Colors.black,
@@ -47,7 +47,7 @@ class CollectionsPage extends ConsumerWidget {
   }
 
   Widget _buildCollectionsList(
-      List<CollectionListItem> collections, BuildContext context) {
+      List<CollectionWithPreviews> collections, BuildContext context) {
     return Padding(
       padding: const EdgeInsets.all(16),
       child: GridView.builder(
@@ -85,7 +85,7 @@ class CollectionsPage extends ConsumerWidget {
               ),
               const SizedBox(height: 2),
               Text(
-                '@${collection.author.username}',
+                '${collection.ebookCount} books',
                 style: TextStyle(
                   color: Colors.white.withValues(alpha: 0.6),
                   fontSize: 12,

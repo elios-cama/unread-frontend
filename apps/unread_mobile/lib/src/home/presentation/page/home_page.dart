@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:common/common.dart';
 import 'package:design_ui/design_ui.dart';
+import 'package:unread_mobile/src/auth/presentation/provider/auth_provider.dart';
+import 'package:unread_mobile/src/auth/domain/model/auth_state_model.dart';
 import '../../../../core/router/route_constants.dart';
 import '../../../collections/presentation/widget/collection_card_widget.dart';
 
@@ -11,11 +13,24 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final collectionsAsync = ref.watch(collectionsListProvider());
+    final collectionsAsync = ref.watch(userCollectionsGridProvider());
+
+    // Listen for auth state changes and redirect if unauthenticated
+    ref.listen(authProvider, (previous, next) {
+      if (next.status == AuthStatus.unauthenticated) {
+        debugPrint('🔄 Auth state changed to unauthenticated, redirecting...');
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (context.mounted) {
+            context.go(AppRoutes.auth);
+          }
+        });
+      }
+    });
 
     return Scaffold(
       extendBodyBehindAppBar: true,
       extendBody: true,
+      backgroundColor: Colors.black,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(50),
         child: Container(
@@ -49,7 +64,7 @@ class HomePage extends ConsumerWidget {
             ),
             actions: [
               IconButton(
-                onPressed: () => _showSignOutDialog(context),
+                onPressed: () => _showSignOutDialog(context, ref),
                 icon: const Icon(Icons.logout, color: Colors.white),
               ),
             ],
@@ -57,24 +72,25 @@ class HomePage extends ConsumerWidget {
         ),
       ),
       body: Stack(
+        fit: StackFit.expand,
         children: [
           collectionsAsync.when(
-            data: (collectionsResponse) =>
-                _buildHomeContent(context, collectionsResponse),
+            data: (collectionsGridResponse) =>
+                _buildHomeContent(context, collectionsGridResponse),
             loading: () => _buildLoadingState(),
             error: (error, stack) => _buildErrorState(error.toString()),
           ),
           Positioned(
             bottom: 24,
             left: MediaQuery.of(context).size.width / 2 - 60,
-            child: _buildFloatingButton(),
+            child: _buildFloatingButton(ref),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFloatingButton() {
+  Widget _buildFloatingButton(WidgetRef ref) {
     return Container(
       width: 120,
       height: 48,
@@ -92,7 +108,7 @@ class HomePage extends ConsumerWidget {
       child: Material(
         color: Colors.transparent,
         child: InkWell(
-          onTap: () => _uploadBook(),
+          onTap: () => _uploadBook(ref),
           borderRadius: BorderRadius.circular(24),
           child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -119,8 +135,8 @@ class HomePage extends ConsumerWidget {
   }
 
   Widget _buildHomeContent(
-      BuildContext context, CollectionsResponse collectionsResponse) {
-    if (collectionsResponse.items.isEmpty) {
+      BuildContext context, CollectionsGridResponse collectionsGridResponse) {
+    if (collectionsGridResponse.items.isEmpty) {
       return _buildEmptyState();
     }
 
@@ -134,14 +150,14 @@ class HomePage extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildCollectionsSection(context, collectionsResponse.items),
+          _buildCollectionsSection(context, collectionsGridResponse.items),
         ],
       ),
     );
   }
 
   Widget _buildCollectionsSection(
-      BuildContext context, List<CollectionListItem> collections) {
+      BuildContext context, List<CollectionWithPreviews> collections) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -182,7 +198,7 @@ class HomePage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '@${collection.author.username}',
+                  '${collection.ebookCount} books',
                   style: TextStyle(
                     color: Colors.white.withValues(alpha: 0.6),
                     fontSize: 12,
@@ -239,50 +255,44 @@ class HomePage extends ConsumerWidget {
   }
 
   Widget _buildEmptyState() {
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: 24,
-        right: 24,
-        top: 24,
-        bottom: 100,
-      ),
-      child: Column(
-        children: [
-          const Spacer(flex: 2),
-          const BookIconWidget(
-            size: 120,
-            useBlueBook: true,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        const Spacer(flex: 2),
+        const BookIconWidget(
+          size: 120,
+          useBlueBook: true,
+        ),
+        const SizedBox(height: 32),
+        const Text(
+          'Welcome to Unread!',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 28,
+            fontWeight: FontWeight.w600,
           ),
-          const SizedBox(height: 32),
-          const Text(
-            'Welcome to Unread!',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 28,
-              fontWeight: FontWeight.w600,
-            ),
+        ),
+        const SizedBox(height: 16),
+        Text(
+          'Your ebook sanctuary is ready.\nStart by uploading your first book.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: Colors.white.withValues(alpha: 0.7),
+            fontSize: 16,
+            height: 1.4,
           ),
-          const SizedBox(height: 16),
-          Text(
-            'Your ebook sanctuary is ready.\nStart by uploading your first book.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
-              fontSize: 16,
-              height: 1.4,
-            ),
-          ),
-          const Spacer(flex: 3),
-        ],
-      ),
+        ),
+        const Spacer(flex: 3),
+      ],
     );
   }
 
-  void _uploadBook() {
-    // TODO: Navigate to book upload
+  void _uploadBook(WidgetRef ref) {
+    // ref.read(authProvider.notifier).getStoredUser();
   }
 
-  void _showSignOutDialog(BuildContext context) {
+  void _showSignOutDialog(BuildContext context, WidgetRef ref) {
     showDialog(
       context: context,
       builder: (context) => UnreadDialog(
@@ -295,9 +305,15 @@ class HomePage extends ConsumerWidget {
           ),
           UnreadDialogAction(
             text: 'Sign Out',
-            onPressed: () {
+            onPressed: () async {
               Navigator.of(context).pop();
-              context.go(AppRoutes.landing);
+
+              debugPrint('🔄 Starting sign out process...');
+
+              // Sign out - the auth state listener will handle navigation
+              await ref.read(authProvider.notifier).signOut();
+
+              debugPrint('✅ Sign out completed');
             },
             isDestructive: true,
             fontWeight: FontWeight.w600,

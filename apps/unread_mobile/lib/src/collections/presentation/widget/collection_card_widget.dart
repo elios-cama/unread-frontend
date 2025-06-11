@@ -3,9 +3,10 @@ import 'package:design_ui/design_ui.dart';
 import 'package:flutter/material.dart';
 import 'package:common/common.dart';
 import 'package:app_ui/app_ui.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class CollectionCardWidget extends StatelessWidget {
-  final CollectionListItem collection;
+  final CollectionWithPreviews collection;
   final VoidCallback onTap;
 
   const CollectionCardWidget({
@@ -42,6 +43,55 @@ class CollectionCardWidget extends StatelessWidget {
   }
 
   Widget _buildBookCoversGrid() {
+    final hasRealCovers = collection.coverPreviews.isNotEmpty;
+
+    if (hasRealCovers) {
+      return _buildRealCoverGrid();
+    } else {
+      return _buildPlaceholderGrid();
+    }
+  }
+
+  Widget _buildRealCoverGrid() {
+    final previews = collection.coverPreviews.take(4).toList();
+
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 1.0,
+        crossAxisSpacing: 1,
+        mainAxisSpacing: 1,
+      ),
+      itemCount: previews.length,
+      itemBuilder: (context, index) {
+        final preview = previews[index];
+        return CachedNetworkImage(
+          imageUrl: preview.coverImageUrl,
+          fit: BoxFit.cover,
+          placeholder: (context, url) => Container(
+            color: Colors.grey[800],
+            child: const Center(
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            ),
+          ),
+          errorWidget: (context, url, error) => Container(
+            color: Colors.grey[800],
+            child: const Icon(
+              Icons.book,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildPlaceholderGrid() {
     final bookImages = _getRandomBookImages();
 
     return GridView.builder(
@@ -73,11 +123,6 @@ class CollectionCardWidget extends StatelessWidget {
       Books.bookNavy,
       Books.bookRed,
       Books.bookWhite,
-      BooksGenerated.camusBook,
-      BooksGenerated.debrayBook,
-      BooksGenerated.rubinBook,
-      BooksGenerated.siddharthaBook,
-      BooksGenerated.tessonBook,
     ];
 
     final random = Random(collection.id.hashCode);

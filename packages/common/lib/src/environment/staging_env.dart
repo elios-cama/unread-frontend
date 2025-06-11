@@ -1,7 +1,7 @@
 import 'package:envied/envied.dart';
 part 'staging_env.g.dart';
 
-@Envied(path: '../../../.env.staging')
+@Envied(path: '../../.env.staging')
 abstract class StagingEnv {
   @EnviedField(varName: 'APP_NAME', defaultValue: 'Unread Staging')
   static const String appName = _StagingEnv.appName;
@@ -17,4 +17,16 @@ abstract class StagingEnv {
     defaultValue: 'https://staging.unread.io',
   )
   static const String webAppUrl = _StagingEnv.webAppUrl;
+
+  @EnviedField(
+    varName: 'SUPABASE_URL',
+    defaultValue: 'https://odrtvtmkapkqutgsmybf.supabase.co',
+  )
+  static const String supabaseUrl = _StagingEnv.supabaseUrl;
+
+  @EnviedField(
+    varName: 'SUPABASE_ANON_KEY',
+    defaultValue: '',
+  )
+  static const String supabaseAnonKey = _StagingEnv.supabaseAnonKey;
 }

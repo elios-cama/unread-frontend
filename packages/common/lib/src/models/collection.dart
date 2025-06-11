@@ -80,7 +80,59 @@ abstract class CollectionsResponse with _$CollectionsResponse {
         items: [],
         total: 0,
         page: 1,
-        size: 10,
+        size: 20,
+        pages: 0,
+      );
+}
+
+@freezed
+abstract class CollectionWithPreviews with _$CollectionWithPreviews {
+  const factory CollectionWithPreviews({
+    required String id,
+    required String name,
+    required String description,
+    required String status,
+    @JsonKey(name: 'author_id') required String authorId,
+    @JsonKey(name: 'ebook_count') required int ebookCount,
+    @JsonKey(name: 'cover_previews') required List<EbookPreview> coverPreviews,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+  }) = _CollectionWithPreviews;
+
+  factory CollectionWithPreviews.fromJson(Map<String, dynamic> json) =>
+      _$CollectionWithPreviewsFromJson(json);
+
+  factory CollectionWithPreviews.empty() => CollectionWithPreviews(
+        id: '',
+        name: '',
+        description: '',
+        status: '',
+        authorId: '',
+        ebookCount: 0,
+        coverPreviews: [],
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+}
+
+@freezed
+abstract class CollectionsGridResponse with _$CollectionsGridResponse {
+  const factory CollectionsGridResponse({
+    required List<CollectionWithPreviews> items,
+    required int total,
+    required int page,
+    required int size,
+    required int pages,
+  }) = _CollectionsGridResponse;
+
+  factory CollectionsGridResponse.fromJson(Map<String, dynamic> json) =>
+      _$CollectionsGridResponseFromJson(json);
+
+  factory CollectionsGridResponse.empty() => const CollectionsGridResponse(
+        items: [],
+        total: 0,
+        page: 1,
+        size: 20,
         pages: 0,
       );
 }
