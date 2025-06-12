@@ -1,9 +1,19 @@
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'user_public.dart';
 import 'ebook.dart';
+import '../utils/collection_color_utils.dart';
 
 part 'collection.freezed.dart';
 part 'collection.g.dart';
+
+// Helper functions for JSON serialization
+CollectionColor? _colorFromJson(String? json) {
+  return CollectionColorUtils.fromString(json);
+}
+
+String? _colorToJson(CollectionColor? color) {
+  return color != null ? CollectionColorUtils.toApiString(color) : null;
+}
 
 @freezed
 abstract class CollectionListItem with _$CollectionListItem {
@@ -15,6 +25,12 @@ abstract class CollectionListItem with _$CollectionListItem {
     @JsonKey(name: 'author_id') required String authorId,
     @JsonKey(name: 'created_at') required String createdAt,
     @JsonKey(name: 'updated_at') required String updatedAt,
+    @JsonKey(
+      name: 'color',
+      fromJson: _colorFromJson,
+      toJson: _colorToJson,
+    )
+    CollectionColor? color,
     required UserPublic author,
   }) = _CollectionListItem;
 
@@ -29,6 +45,7 @@ abstract class CollectionListItem with _$CollectionListItem {
         authorId: '',
         createdAt: '',
         updatedAt: '',
+        color: null,
         author: UserPublic.empty(),
       );
 }
@@ -43,6 +60,12 @@ abstract class CollectionWithEbooks with _$CollectionWithEbooks {
     @JsonKey(name: 'author_id') required String authorId,
     @JsonKey(name: 'created_at') required String createdAt,
     @JsonKey(name: 'updated_at') required String updatedAt,
+    @JsonKey(
+      name: 'color',
+      fromJson: _colorFromJson,
+      toJson: _colorToJson,
+    )
+    CollectionColor? color,
     required UserPublic author,
     required List<EbookWithAuthor> ebooks,
   }) = _CollectionWithEbooks;
@@ -58,6 +81,7 @@ abstract class CollectionWithEbooks with _$CollectionWithEbooks {
         authorId: '',
         createdAt: '',
         updatedAt: '',
+        color: null,
         author: UserPublic.empty(),
         ebooks: [],
       );
@@ -97,6 +121,12 @@ abstract class CollectionWithPreviews with _$CollectionWithPreviews {
     @JsonKey(name: 'cover_previews') required List<EbookPreview> coverPreviews,
     @JsonKey(name: 'created_at') required DateTime createdAt,
     @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    @JsonKey(
+      name: 'color',
+      fromJson: _colorFromJson,
+      toJson: _colorToJson,
+    )
+    CollectionColor? color,
   }) = _CollectionWithPreviews;
 
   factory CollectionWithPreviews.fromJson(Map<String, dynamic> json) =>
@@ -112,6 +142,7 @@ abstract class CollectionWithPreviews with _$CollectionWithPreviews {
         coverPreviews: [],
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
+        color: null,
       );
 }
 

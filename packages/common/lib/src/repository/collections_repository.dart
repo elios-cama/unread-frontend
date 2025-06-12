@@ -19,4 +19,29 @@ abstract class CollectionsRepository {
   });
 
   Future<CollectionWithEbooks> getCollectionWithEbooks(String collectionId);
+
+  Future<CollectionWithEbooks> createCollection({
+    required String name,
+    String? description,
+    String status = 'private',
+  });
+
+  Future<CollectionWithEbooks> updateCollection({
+    required String collectionId,
+    String? name,
+    String? description,
+    String? status,
+  });
+
+  Future<void> deleteCollection(String collectionId);
+
+  Future<void> addEbookToCollection({
+    required String collectionId,
+    required String ebookId,
+  });
+
+  Future<void> removeEbookFromCollection({
+    required String collectionId,
+    required String ebookId,
+  });
 }

@@ -131,3 +131,40 @@ class CollectionDetails extends _$CollectionDetails {
     });
   }
 }
+
+@riverpod
+class CollectionCreation extends _$CollectionCreation {
+  @override
+  FutureOr<CollectionWithEbooks?> build() {
+    // Initial state - no collection being created
+    return null;
+  }
+
+  Future<CollectionWithEbooks> createCollection({
+    required String name,
+    String? description,
+    String status = 'private',
+  }) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(collectionsRepositoryProvider);
+      final collection = await repository.createCollection(
+        name: name,
+        description: description,
+        status: status,
+      );
+
+      // Refresh collections grid after creation
+      ref.invalidate(userCollectionsGridProvider);
+
+      return collection;
+    });
+
+    return state.requireValue!;
+  }
+
+  void reset() {
+    state = const AsyncData(null);
+  }
+}

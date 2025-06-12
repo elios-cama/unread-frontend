@@ -20,6 +20,31 @@ abstract class CollectionsRemoteDataSource {
   });
 
   Future<CollectionWithEbooks> getCollectionWithEbooks(String collectionId);
+
+  Future<CollectionWithEbooks> createCollection({
+    required String name,
+    String? description,
+    String status = 'private',
+  });
+
+  Future<CollectionWithEbooks> updateCollection({
+    required String collectionId,
+    String? name,
+    String? description,
+    String? status,
+  });
+
+  Future<void> deleteCollection(String collectionId);
+
+  Future<void> addEbookToCollection({
+    required String collectionId,
+    required String ebookId,
+  });
+
+  Future<void> removeEbookFromCollection({
+    required String collectionId,
+    required String ebookId,
+  });
 }
 
 class CollectionsRemoteDataSourceImpl implements CollectionsRemoteDataSource {
@@ -115,6 +140,91 @@ class CollectionsRemoteDataSourceImpl implements CollectionsRemoteDataSource {
           response.data as Map<String, dynamic>);
     } on DioException catch (e) {
       throw Exception('Failed to fetch collection with ebooks: ${e.message}');
+    }
+  }
+
+  @override
+  Future<CollectionWithEbooks> createCollection({
+    required String name,
+    String? description,
+    String status = 'private',
+  }) async {
+    try {
+      final response = await dio.post(
+        '/api/v1/collections/',
+        data: {
+          'name': name,
+          'description': description,
+          'status': status,
+        },
+      );
+
+      return CollectionWithEbooks.fromJson(
+          response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw Exception('Failed to create collection: ${e.message}');
+    }
+  }
+
+  @override
+  Future<CollectionWithEbooks> updateCollection({
+    required String collectionId,
+    String? name,
+    String? description,
+    String? status,
+  }) async {
+    try {
+      final response = await dio.put(
+        '/api/v1/collections/$collectionId',
+        data: {
+          'name': name,
+          'description': description,
+          'status': status,
+        },
+      );
+
+      return CollectionWithEbooks.fromJson(
+          response.data as Map<String, dynamic>);
+    } on DioException catch (e) {
+      throw Exception('Failed to update collection: ${e.message}');
+    }
+  }
+
+  @override
+  Future<void> deleteCollection(String collectionId) async {
+    try {
+      await dio.delete('/api/v1/collections/$collectionId');
+    } on DioException catch (e) {
+      throw Exception('Failed to delete collection: ${e.message}');
+    }
+  }
+
+  @override
+  Future<void> addEbookToCollection({
+    required String collectionId,
+    required String ebookId,
+  }) async {
+    try {
+      await dio.post(
+        '/api/v1/collections/$collectionId/ebooks',
+        data: {
+          'ebook_id': ebookId,
+        },
+      );
+    } on DioException catch (e) {
+      throw Exception('Failed to add ebook to collection: ${e.message}');
+    }
+  }
+
+  @override
+  Future<void> removeEbookFromCollection({
+    required String collectionId,
+    required String ebookId,
+  }) async {
+    try {
+      await dio.delete('/api/v1/collections/$collectionId/ebooks/$ebookId');
+    } on DioException catch (e) {
+      throw Exception('Failed to remove ebook from collection: ${e.message}');
     }
   }
 }

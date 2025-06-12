@@ -47,6 +47,8 @@ class CollectionCardWidget extends StatelessWidget {
 
     if (hasRealCovers) {
       return _buildRealCoverGrid();
+    } else if (collection.color != null) {
+      return _buildGradientBackground();
     } else {
       return _buildPlaceholderGrid();
     }
@@ -88,6 +90,18 @@ class CollectionCardWidget extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildGradientBackground() {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: CollectionColorUtils.createGradient(
+          collection.color!,
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+      ),
     );
   }
 

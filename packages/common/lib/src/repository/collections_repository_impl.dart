@@ -65,4 +65,79 @@ class CollectionsRepositoryImpl implements CollectionsRepository {
       throw Exception('Failed to get collection with ebooks: $e');
     }
   }
+
+  @override
+  Future<CollectionWithEbooks> createCollection({
+    required String name,
+    String? description,
+    String status = 'private',
+  }) async {
+    try {
+      return await remoteDataSource.createCollection(
+        name: name,
+        description: description,
+        status: status,
+      );
+    } catch (e) {
+      throw Exception('Failed to create collection: $e');
+    }
+  }
+
+  @override
+  Future<CollectionWithEbooks> updateCollection({
+    required String collectionId,
+    String? name,
+    String? description,
+    String? status,
+  }) async {
+    try {
+      return await remoteDataSource.updateCollection(
+        collectionId: collectionId,
+        name: name,
+        description: description,
+        status: status,
+      );
+    } catch (e) {
+      throw Exception('Failed to update collection: $e');
+    }
+  }
+
+  @override
+  Future<void> deleteCollection(String collectionId) async {
+    try {
+      await remoteDataSource.deleteCollection(collectionId);
+    } catch (e) {
+      throw Exception('Failed to delete collection: $e');
+    }
+  }
+
+  @override
+  Future<void> addEbookToCollection({
+    required String collectionId,
+    required String ebookId,
+  }) async {
+    try {
+      await remoteDataSource.addEbookToCollection(
+        collectionId: collectionId,
+        ebookId: ebookId,
+      );
+    } catch (e) {
+      throw Exception('Failed to add ebook to collection: $e');
+    }
+  }
+
+  @override
+  Future<void> removeEbookFromCollection({
+    required String collectionId,
+    required String ebookId,
+  }) async {
+    try {
+      await remoteDataSource.removeEbookFromCollection(
+        collectionId: collectionId,
+        ebookId: ebookId,
+      );
+    } catch (e) {
+      throw Exception('Failed to remove ebook from collection: $e');
+    }
+  }
 }
