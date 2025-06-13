@@ -7,7 +7,6 @@ import 'package:unread_mobile/src/auth/presentation/provider/auth_provider.dart'
 import 'package:unread_mobile/src/auth/domain/model/auth_state_model.dart';
 import '../../../../core/router/route_constants.dart';
 import '../../../collections/presentation/widget/collection_card_widget.dart';
-import 'dart:ui';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -370,7 +369,7 @@ class _ExpandableUploadButtonState extends State<_ExpandableUploadButton>
 
     // Show loading state if collection is being created
     if (collectionCreationAsync.isLoading) {
-      return _buildLiquidGlassContainer(
+      return LiquidGlassContainer(
         width: 120,
         height: 48,
         child: const Center(
@@ -391,9 +390,10 @@ class _ExpandableUploadButtonState extends State<_ExpandableUploadButton>
       curve: Curves.easeOutCubic,
       width: _isExpanded ? 220 : 120,
       height: _isExpanded ? 220 : 48,
-      child: _buildLiquidGlassContainer(
+      child: LiquidGlassContainer(
         width: _isExpanded ? 220 : 120,
         height: _isExpanded ? 220 : 48,
+        borderRadius: _isExpanded ? 16 : 24,
         child: InkWell(
           splashColor: Colors.transparent,
           onTap: _isExpanded ? null : _toggleMenu,
@@ -404,55 +404,6 @@ class _ExpandableUploadButtonState extends State<_ExpandableUploadButton>
                 ? _buildExpandedContent()
                 : _buildCollapsedContent(),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLiquidGlassContainer({
-    required double width,
-    required double height,
-    required Widget child,
-  }) {
-    final isCircular =
-        height < 100; // Assuming collapsed state is more circular
-    final borderRadiusValue = isCircular ? 24.0 : 16.0;
-
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(borderRadiusValue),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-            sigmaX: 12, sigmaY: 12), // Slightly more blur for softer glass
-        child: Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                Colors.white.withValues(alpha: 0.15), // More transparent
-                Colors.white.withValues(alpha: 0.05), // Even more transparent
-              ],
-              stops: const [0.1, 0.9], // Adjusted stops for smoother transition
-            ),
-            borderRadius: BorderRadius.circular(borderRadiusValue),
-            border: Border.all(
-              color: Colors.white
-                  .withValues(alpha: 0.15), // Thinner, more transparent border
-              width: 1.0,
-            ),
-            boxShadow: [
-              // Very soft outer shadow for subtle depth
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.08),
-                blurRadius: 25,
-                offset: const Offset(0, 5),
-                spreadRadius: -10,
-              ),
-            ],
-          ),
-          child: child, // Removed the inner shimmer Stack for a cleaner glass
         ),
       ),
     );

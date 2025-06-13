@@ -7,5 +7,6 @@ export 'src/widgets/unread_icon_button_widget.dart';
 export 'src/widgets/unread_dialog_widget.dart';
 export 'src/widgets/unread_lottie_widget.dart';
 export 'src/widgets/unread_loading_widget.dart';
+export 'src/widgets/liquid_glass_container_widget.dart';
 
 // TODO: Export any libraries intended for clients of this package.

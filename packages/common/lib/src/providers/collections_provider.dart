@@ -168,3 +168,66 @@ class CollectionCreation extends _$CollectionCreation {
     state = const AsyncData(null);
   }
 }
+
+@riverpod
+class CollectionUpdate extends _$CollectionUpdate {
+  @override
+  FutureOr<CollectionWithEbooks?> build() async {
+    return null;
+  }
+
+  Future<void> updateCollection({
+    required String collectionId,
+    String? name,
+    String? description,
+    String? status,
+  }) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(collectionsRepositoryProvider);
+      await repository.updateCollection(
+        collectionId: collectionId,
+        name: name,
+        description: description,
+        status: status,
+      );
+
+      // Refresh collection details after update
+      ref.invalidate(collectionDetailsProvider(collectionId));
+      ref.invalidate(userCollectionsGridProvider);
+
+      return;
+    });
+  }
+
+  void reset() {
+    state = const AsyncData(null);
+  }
+}
+
+@riverpod
+class CollectionDeletion extends _$CollectionDeletion {
+  @override
+  FutureOr<void> build() async {
+    return null;
+  }
+
+  Future<void> deleteCollection(String collectionId) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(collectionsRepositoryProvider);
+      await repository.deleteCollection(collectionId);
+
+      ref.invalidate(userCollectionsGridProvider);
+      ref.invalidate(userCollectionsListProvider);
+
+      return;
+    });
+  }
+
+  void reset() {
+    state = const AsyncData(null);
+  }
+}

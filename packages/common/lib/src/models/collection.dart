@@ -114,7 +114,7 @@ abstract class CollectionWithPreviews with _$CollectionWithPreviews {
   const factory CollectionWithPreviews({
     required String id,
     required String name,
-    required String description,
+    String? description,
     required String status,
     @JsonKey(name: 'author_id') required String authorId,
     @JsonKey(name: 'ebook_count') required int ebookCount,
