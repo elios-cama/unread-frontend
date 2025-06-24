@@ -7,6 +7,8 @@ import 'package:cached_network_image/cached_network_image.dart';
 import '../../../../core/router/route_constants.dart';
 import '../widget/ebook_card_widget.dart';
 import '../widget/collection_menu_widget.dart';
+import '../widget/ebook_menu_widget.dart';
+import '../widget/add_books_to_collection_dialog.dart';
 
 class CollectionDetailPage extends ConsumerStatefulWidget {
   final String collectionId;
@@ -369,12 +371,35 @@ class _CollectionDetailPageState extends ConsumerState<CollectionDetailPage>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        child: EbookCardWidget(
-                          ebook: ebook,
-                          onTap: () => context.pushNamed(
-                            AppRoutes.ebookName,
-                            pathParameters: {'ebookId': ebook.id},
-                          ),
+                        child: Stack(
+                          children: [
+                            EbookCardWidget(
+                              ebook: ebook,
+                              onTap: () => context.pushNamed(
+                                AppRoutes.ebookName,
+                                pathParameters: {'ebookId': ebook.id},
+                              ),
+                            ),
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: GestureDetector(
+                                onTap: () => _showEbookMenu(context, ebook),
+                                child: Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withValues(alpha: 0.7),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.more_vert,
+                                    color: Colors.white,
+                                    size: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 8),
@@ -443,7 +468,12 @@ class _CollectionDetailPageState extends ConsumerState<CollectionDetailPage>
   }
 
   Widget _buildBookCoversGrid(List<EbookWithAuthor> ebooks) {
-    final coversToShow = ebooks.take(4).toList();
+    final coversToShow = ebooks
+        .take(4)
+        .toList()
+        .where((ebook) =>
+            ebook.coverImagePath != null && ebook.coverImagePath!.isNotEmpty)
+        .toList();
 
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
@@ -466,7 +496,7 @@ class _CollectionDetailPageState extends ConsumerState<CollectionDetailPage>
   Widget _buildBookCover(EbookWithAuthor ebook) {
     final coverPath = ebook.coverImagePath;
 
-    if (coverPath.isNotEmpty) {
+    if (coverPath != null && coverPath.isNotEmpty) {
       return CachedNetworkImage(
         imageUrl: coverPath,
         fit: BoxFit.cover,
@@ -617,29 +647,25 @@ class _CollectionDetailPageState extends ConsumerState<CollectionDetailPage>
   void _showAddBooksDialog() {
     showDialog(
       context: context,
-      builder: (context) => UnreadDialog(
-        title: 'Add Books',
-        content:
-            'Feature coming soon! You\'ll be able to add books from your library to this collection.',
-        actions: [
-          GestureDetector(
-            onTap: () => Navigator.of(context).pop(),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Text(
-                'OK',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
+      barrierColor: Colors.black.withValues(alpha: 0.7),
+      builder: (context) => AddBooksToCollectionDialog(
+        collectionId: widget.collectionId,
+      ),
+    );
+  }
+
+  void _showEbookMenu(BuildContext context, EbookWithAuthor ebook) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.7),
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Center(
+          child: EbookMenuWidget(
+            ebook: ebook,
+            currentCollectionId: widget.collectionId,
           ),
-        ],
+        ),
       ),
     );
   }

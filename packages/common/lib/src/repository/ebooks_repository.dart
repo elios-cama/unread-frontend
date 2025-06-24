@@ -1,3 +1,4 @@
+import 'dart:io';
 import '../models/models.dart';
 
 abstract class EbooksRepository {
@@ -9,4 +10,17 @@ abstract class EbooksRepository {
   });
 
   Future<EbookWithAuthor> getEbook(String ebookId);
+
+  Future<Ebook> createEbook({
+    required String title,
+    int? pageCount,
+    String status = 'PRIVATE',
+  });
+
+  Future<String> uploadEbookWithSupabase({
+    required File file,
+    required String title,
+    required String collectionId,
+    int? pageCount,
+  });
 }

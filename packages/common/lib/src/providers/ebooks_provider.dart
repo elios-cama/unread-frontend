@@ -1,6 +1,8 @@
+import 'package:common/src/providers/collections_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:authentication/authentication.dart';
+import 'dart:io';
 import '../data_source/ebooks_remote_data_source.dart';
 import '../repository/ebooks_repository.dart';
 import '../repository/ebooks_repository_impl.dart';
@@ -71,5 +73,53 @@ class EbookDetails extends _$EbookDetails {
       final repository = ref.read(ebooksRepositoryProvider);
       return repository.getEbook(ebookId);
     });
+  }
+}
+
+@riverpod
+class EbookUpload extends _$EbookUpload {
+  @override
+  FutureOr<String?> build() {
+    return null;
+  }
+
+  Future<String> uploadEbookToCollection({
+    required String title,
+    required File file,
+    required String collectionId,
+    int? pageCount,
+  }) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(ebooksRepositoryProvider);
+
+      // Upload ebook using new Supabase flow
+      final ebookId = await repository.uploadEbookWithSupabase(
+        file: file,
+        title: title,
+        collectionId: collectionId,
+        pageCount: pageCount,
+      );
+
+      // Add to collection
+      await ref
+          .read(ebookCollectionManagementProvider.notifier)
+          .addEbookToCollection(
+            collectionId: collectionId,
+            ebookId: ebookId,
+          );
+
+      // Refresh ebook lists
+      ref.invalidate(ebooksListProvider);
+
+      return ebookId;
+    });
+
+    return state.requireValue!;
+  }
+
+  void reset() {
+    state = const AsyncData(null);
   }
 }

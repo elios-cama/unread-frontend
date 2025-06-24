@@ -231,3 +231,55 @@ class CollectionDeletion extends _$CollectionDeletion {
     state = const AsyncData(null);
   }
 }
+
+@riverpod
+class EbookCollectionManagement extends _$EbookCollectionManagement {
+  @override
+  FutureOr<void> build() async {
+    return null;
+  }
+
+  Future<void> addEbookToCollection({
+    required String collectionId,
+    required String ebookId,
+  }) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(collectionsRepositoryProvider);
+      await repository.addEbookToCollection(
+        collectionId: collectionId,
+        ebookId: ebookId,
+      );
+
+      ref.invalidate(collectionDetailsProvider(collectionId));
+      ref.invalidate(userCollectionsGridProvider);
+
+      return;
+    });
+  }
+
+  Future<void> removeEbookFromCollection({
+    required String collectionId,
+    required String ebookId,
+  }) async {
+    state = const AsyncLoading();
+
+    state = await AsyncValue.guard(() async {
+      final repository = ref.read(collectionsRepositoryProvider);
+      await repository.removeEbookFromCollection(
+        collectionId: collectionId,
+        ebookId: ebookId,
+      );
+
+      ref.invalidate(collectionDetailsProvider(collectionId));
+      ref.invalidate(userCollectionsGridProvider);
+
+      return;
+    });
+  }
+
+  void reset() {
+    state = const AsyncData(null);
+  }
+}

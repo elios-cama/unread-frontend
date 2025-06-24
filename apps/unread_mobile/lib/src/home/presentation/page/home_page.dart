@@ -7,6 +7,7 @@ import 'package:unread_mobile/src/auth/presentation/provider/auth_provider.dart'
 import 'package:unread_mobile/src/auth/domain/model/auth_state_model.dart';
 import '../../../../core/router/route_constants.dart';
 import '../../../collections/presentation/widget/collection_card_widget.dart';
+import '../../../collections/presentation/widget/collection_selector_widget.dart';
 
 class HomePage extends ConsumerWidget {
   const HomePage({super.key});
@@ -544,7 +545,75 @@ class _ExpandableUploadButtonState extends State<_ExpandableUploadButton>
     }
   }
 
-  void _uploadBook() {}
+  void _uploadBook() {
+    _showCollectionSelectorForUpload();
+  }
+
+  void _showCollectionSelectorForUpload() {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.7),
+      builder: (context) => CollectionSelectorWidget(
+        onCollectionSelected: (collection) async {
+          Navigator.of(context).pop();
+          _uploadBookToCollection(collection.id);
+        },
+        onCreateNew: () async {
+          Navigator.of(context).pop();
+          try {
+            final collection = await widget.ref
+                .read(collectionCreationProvider.notifier)
+                .createCollection(
+                  name: 'New Collection',
+                  description: '',
+                  status: 'private',
+                );
+            _uploadBookToCollection(collection.id);
+          } catch (e) {
+            _showErrorDialog('Failed to create collection');
+          }
+        },
+        showCreateNew: true,
+      ),
+    );
+  }
+
+  void _uploadBookToCollection(String collectionId) {
+    debugPrint('📚 Upload book to collection: $collectionId');
+    // TODO: Implement actual book upload functionality
+    // This would integrate with the backend upload APIs
+    // For now, we'll show a placeholder dialog
+    showDialog(
+      context: context,
+      builder: (context) => UnreadDialog(
+        title: 'Upload Book',
+        content:
+            'Book upload functionality will be implemented soon. The book will be added to the selected collection.',
+        actions: [
+          UnreadDialogAction(
+            text: 'OK',
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => UnreadDialog(
+        title: 'Error',
+        content: message,
+        actions: [
+          UnreadDialogAction(
+            text: 'OK',
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+    );
+  }
 
   void _convertFile() {
     debugPrint('🔄 Convert file action');

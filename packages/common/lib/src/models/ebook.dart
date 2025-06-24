@@ -33,18 +33,51 @@ abstract class EbookListItem with _$EbookListItem {
 }
 
 @freezed
+abstract class Ebook with _$Ebook {
+  const factory Ebook({
+    required String id,
+    required String title,
+    @JsonKey(name: 'page_count') int? pageCount,
+    required String status,
+    @JsonKey(name: 'author_id') required String authorId,
+    @JsonKey(name: 'file_path') String? filePath,
+    @JsonKey(name: 'cover_image_path') String? coverImagePath,
+    @JsonKey(name: 'file_size') int? fileSize,
+    @JsonKey(name: 'download_count') required int downloadCount,
+    @JsonKey(name: 'created_at') required DateTime createdAt,
+    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+  }) = _Ebook;
+
+  factory Ebook.fromJson(Map<String, dynamic> json) => _$EbookFromJson(json);
+
+  factory Ebook.empty() => Ebook(
+        id: '',
+        title: '',
+        pageCount: null,
+        status: '',
+        authorId: '',
+        filePath: null,
+        coverImagePath: null,
+        fileSize: null,
+        downloadCount: 0,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+      );
+}
+
+@freezed
 abstract class EbookWithAuthor with _$EbookWithAuthor {
   const factory EbookWithAuthor({
     required String id,
     required String title,
-    @JsonKey(name: 'page_count') required int pageCount,
+    @JsonKey(name: 'page_count') int? pageCount,
     required String status,
-    @JsonKey(name: 'file_path') required String filePath,
-    @JsonKey(name: 'cover_image_path') required String coverImagePath,
-    @JsonKey(name: 'file_size') required int fileSize,
+    @JsonKey(name: 'file_path') String? filePath,
+    @JsonKey(name: 'cover_image_path') String? coverImagePath,
+    @JsonKey(name: 'file_size') int? fileSize,
     @JsonKey(name: 'download_count') required int downloadCount,
-    @JsonKey(name: 'created_at') required DateTime createdAt,
-    @JsonKey(name: 'updated_at') required DateTime updatedAt,
+    @JsonKey(name: 'created_at') required String createdAt,
+    @JsonKey(name: 'updated_at') required String updatedAt,
     @JsonKey(name: 'author_id') required String authorId,
     required UserPublic author,
   }) = _EbookWithAuthor;
@@ -55,14 +88,14 @@ abstract class EbookWithAuthor with _$EbookWithAuthor {
   factory EbookWithAuthor.empty() => EbookWithAuthor(
         id: '',
         title: '',
-        pageCount: 0,
+        pageCount: null,
         status: '',
-        filePath: '',
-        coverImagePath: '',
-        fileSize: 0,
+        filePath: null,
+        coverImagePath: null,
+        fileSize: null,
         downloadCount: 0,
-        createdAt: DateTime.now(),
-        updatedAt: DateTime.now(),
+        createdAt: '',
+        updatedAt: '',
         authorId: '',
         author: UserPublic.empty(),
       );
@@ -105,5 +138,91 @@ abstract class EbooksResponse with _$EbooksResponse {
         page: 1,
         size: 20,
         pages: 0,
+      );
+}
+
+enum PrivacyStatus {
+  private,
+  public,
+  inviteOnly,
+}
+
+@freezed
+abstract class UploadUrlRequest with _$UploadUrlRequest {
+  const factory UploadUrlRequest({
+    @JsonKey(name: 'file_extension') required String fileExtension,
+    @JsonKey(name: 'collection_id') String? collectionId,
+  }) = _UploadUrlRequest;
+
+  factory UploadUrlRequest.fromJson(Map<String, dynamic> json) =>
+      _$UploadUrlRequestFromJson(json);
+
+  factory UploadUrlRequest.empty() => const UploadUrlRequest(
+        fileExtension: '',
+        collectionId: null,
+      );
+}
+
+@freezed
+abstract class UploadUrlResponse with _$UploadUrlResponse {
+  const factory UploadUrlResponse({
+    @JsonKey(name: 'signed_url') required String signedUrl,
+    @JsonKey(name: 'file_path') required String filePath,
+    required String bucket,
+    @JsonKey(name: 'expires_in') required int expiresIn,
+    String? token,
+  }) = _UploadUrlResponse;
+
+  factory UploadUrlResponse.fromJson(Map<String, dynamic> json) =>
+      _$UploadUrlResponseFromJson(json);
+
+  factory UploadUrlResponse.empty() => const UploadUrlResponse(
+        signedUrl: '',
+        filePath: '',
+        bucket: '',
+        expiresIn: 0,
+        token: null,
+      );
+}
+
+@freezed
+abstract class ConfirmUploadRequest with _$ConfirmUploadRequest {
+  const factory ConfirmUploadRequest({
+    @JsonKey(name: 'file_path') required String filePath,
+    required String bucket,
+    @JsonKey(name: 'ebook_id') required String ebookId,
+  }) = _ConfirmUploadRequest;
+
+  factory ConfirmUploadRequest.fromJson(Map<String, dynamic> json) =>
+      _$ConfirmUploadRequestFromJson(json);
+
+  factory ConfirmUploadRequest.empty() => const ConfirmUploadRequest(
+        filePath: '',
+        bucket: '',
+        ebookId: '',
+      );
+}
+
+@freezed
+abstract class ConfirmUploadResponse with _$ConfirmUploadResponse {
+  const factory ConfirmUploadResponse({
+    required bool confirmed,
+    @JsonKey(name: 'file_path') required String filePath,
+    required String bucket,
+    @JsonKey(name: 'file_size') required int fileSize,
+    @JsonKey(name: 'content_type') required String contentType,
+    @JsonKey(name: 'last_modified') required String lastModified,
+  }) = _ConfirmUploadResponse;
+
+  factory ConfirmUploadResponse.fromJson(Map<String, dynamic> json) =>
+      _$ConfirmUploadResponseFromJson(json);
+
+  factory ConfirmUploadResponse.empty() => const ConfirmUploadResponse(
+        confirmed: false,
+        filePath: '',
+        bucket: '',
+        fileSize: 0,
+        contentType: '',
+        lastModified: '',
       );
 }
